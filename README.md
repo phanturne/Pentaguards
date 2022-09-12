@@ -15,8 +15,8 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
 * Mini-games (w/ gambling)
     * Rock-Paper-Scissors, Roulette, Blackjack, Flip Coin, Dice
 * Trivia
-* Praise
-* Insult
+* Praise (Targeting Options)
+* Insult (Targeting Options)
 * Magic 8 Ball 
 
 #### Resources:
