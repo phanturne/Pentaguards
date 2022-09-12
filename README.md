@@ -6,5 +6,18 @@ She'll tell you a joke or invite you to play a game.
 
 For more info, visit [pentaguards.com](https://www.pentaguards.com).
 
+### To Be Implemented:
+* New Profile Picture
+* Update Website
+* Economy System 
+    * Store - Raffle System, Direct Purchase
+* Randomly Spawning Treasure Chests
+* Mini-games (w/ gambling)
+    * Rock-Paper-Scissors, Roulette, Blackjack, Flip Coin, Dice
+* Trivia
+* Praise
+* Insult
+* Magic 8 Ball 
+
 #### Resources:
 [FreeCodeCamp's YouTube Tutorial](https://youtu.be/7rU_KyudGBY)
