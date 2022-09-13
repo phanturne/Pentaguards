@@ -1,7 +1,7 @@
 {
   "name": "nodejs",
   "version": "1.0.0",
-  "description": "",
+  "description": "Angelina is an open-source Discord bot written in JavaScript. It supports a full-fledged economy system, comes with a variety of mini-games,  and much more. Incentivize your members to actively participate in your server with customizable roles, badges, or any reward of your choice.  Utilize the moderation system to punish mischief with her Sword of Justice. Feeling down? She'll send you words of encouragement. Feeling bored?  She'll tell you a joke or invite you to play a game.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,9 +10,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/rest": "^1.1.0",
     "@replit/database": "^2.0.2",
     "@types/node": "^18.0.6",
     "discord.js": "^14.3.0",
-    "node-fetch": "^3.2.6"
-  }
+    "node-fetch": "^2.6.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phanturne/Angelina.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phanturne/Angelina/issues"
+  },
+  "homepage": "https://github.com/phanturne/Angelina#readme"
 }

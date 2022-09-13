@@ -1,8 +1,31 @@
-// Require the necessary modules
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
-const fetch = require("node-fetch");
+// Require the necessary classes
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { clientId, guildId, token } = require('./config.json');
+// const fetch = require("node-fetch");
 const Database = require("@replit/database");
-const fs = require("fs");
+const fs = require("node:fs");
+const path = require('node:path');
+
+// Create a new client instance
+// const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    ]
+});
+
+client.commands = new Collection();
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const command = require(filePath);
+  // Set a new item in the Collection w/ key = command name, value = module
+  client.commands.set(command.data.name, command);
+}
 
 const db = new Database();
 
@@ -20,6 +43,7 @@ db.get("encouragements").then(encouragements => {
   }
 })
 
+// Initialize responding state to true
 db.get("responding").then(value => {
   if (value == null) {
     db.set("responding", true);
@@ -44,42 +68,29 @@ function deleteEncouragement(index) {
   })
 }
 
-// Fetch a random quote from Zen Quotes
-function getQuote() {
-  return fetch("https://zenquotes.io/api/random")
-    .then(res => {
-      return res.json();
-  })
-  .then(data => {
-    return ">>> \"" + data[0]["q"] + "\"\n — " + data[0]["a"];
-  })
-}
 
-// Fetch a random joke from https://github.com/15Dkatz/official_joke_api
-function getJoke() {
-  return fetch("https://official-joke-api.wl.r.appspot.com/jokes/random")
-    .then(res => {
-      return res.json();
-  })
-  .then(data => {
-    return ">>> " + data["setup"] + "\n" + "*" + data["punchline"] + "*";
-  })
-}
-
-// Create a new client instance
-const client = new Client({ 
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    ], 
-  partials: [Partials.Channel] 
-});
 
 // When the client is ready, run this code
 client.once("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  db.set("encouragements", starterEncouragements);
 });
+
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  // Fetch the command in the Collection
+  const command = interaction.client.commands.get(interaction.commandName);
+
+  if (!command) return; // Exit early if the command does not exist
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    console.error(error);
+    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })
+  }
+})
 
 client.on("messageCreate", msg => {
   // Prevents the bot from responding to its own messages
@@ -93,6 +104,11 @@ client.on("messageCreate", msg => {
   // $joke: Sends a random joke to the channel
   if (msg.content === "$joke") {
     getJoke().then(joke => msg.channel.send(joke));
+  }
+
+  // $insult: Sends a random insult to the channel
+  if (msg.content === "$insult") {
+    getInsult().then(insult => msg.channel.send(insult));
   }
   
   // Reply to the user with an encouragement if a sad word is detected
@@ -147,5 +163,4 @@ client.on("messageCreate", msg => {
 });
 
 // Login to Discord with your client's token
-const TOKEN = process.env['TOKEN'];
-client.login(TOKEN);
+client.login(token);
