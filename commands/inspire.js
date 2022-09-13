@@ -3,13 +3,13 @@ const fetch = require("node-fetch");
 
 // Fetch a random quote from Zen Quotes
 function getQuote() {
-  return fetch("https://zenquotes.io/api/random")
+    return fetch("https://zenquotes.io/api/random")
     .then(res => {
-      return res.json();
-  })
-  .then(data => {
-    return ">>> \"" + data[0]["q"] + "\"\n — " + data[0]["a"];
-  })
+        return res.json();
+    })
+    .then(data => {
+        return ">>> *\"" + data[0]["q"] + "*\"\n — " + data[0]["a"];
+    })
 }
 
 module.exports = {

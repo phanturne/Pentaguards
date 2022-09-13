@@ -16,11 +16,16 @@ for (const file of commandFiles) {
 	commands.push(command.data.toJSON());
 }
 
-// const commands = [
-// 	new SlashCommandBuilder().setName('inspire').setDescription('Replies with an inspirational quote'),
-// ]
-// 	.map(command => command.toJSON());
-
 rest.put(Routes.applicationCommands(clientId, guildId), { body: commands })
 	.then((data) => console.log(`Successfully registered ${data.length} application commands.`))
 	.catch(console.error);
+
+// // for global commands
+// rest.put(Routes.applicationCommands(clientId), { body: [] })
+// 	.then(() => console.log('Successfully deleted all application commands.'))
+// 	.catch(console.error);
+
+// // for guild-based commands
+// rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: [] })
+// 	.then(() => console.log('Successfully deleted all guild commands.'))
+// 	.catch(console.error);
