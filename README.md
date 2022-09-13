@@ -20,4 +20,4 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
 * Magic 8 Ball 
 
 #### Resources:
-[FreeCodeCamp's YouTube Tutorial](https://youtu.be/7rU_KyudGBY)
+[Discord.js Guide](https://discordjs.guide/#before-you-begin)
