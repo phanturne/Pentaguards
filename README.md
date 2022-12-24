@@ -1,8 +1,5 @@
-# Angelina (Work In Progress)
-Angelina is an open-source Discord bot written in JavaScript. It supports a full-fledged economy system, comes with a variety of mini-games, 
-and much more. Incentivize your members to actively participate in your server with customizable roles, badges, or any reward of your choice. 
-Utilize the moderation system to punish mischief with her Sword of Justice. Feeling down? She'll send you words of encouragement. Feeling bored? 
-She'll tell you a joke or invite you to play a game.
+# Pentaguards (Work In Progress)
+Pentaguards is a Discord bot that offers a range of features including a moderation system with mod-mail, a customizable economy system, mini-games, and a community-run trading card game with AI-generated artwork. It also uses state-of-the-art techniques to provide personalized, uplifting experiences for users, including encouragement, inspiration, humor, and social support, fostering a positive and supportive community atmosphere. 
 
 For more info, visit [pentaguards.com](https://www.pentaguards.com).
 
