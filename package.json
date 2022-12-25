@@ -1,6 +1,6 @@
 {
   "engines": {
-    "node": ">=15.0.0",
+    "node": ">=16.9.0",
     "npm": "<=5.0.0"
   },
   "name": "pentaguards",
