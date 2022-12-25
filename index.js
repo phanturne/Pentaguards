@@ -2,7 +2,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+
+// Importing this allows you to access the environment variables of the running node process
+require("dotenv").config();
 
 // Create a new client instance
 const client = new Client({
@@ -49,7 +51,7 @@ for (const file of eventFiles) {
 }
 
 // Log in to Discord with your client's token
-client.login(token);
+client.login(process.env.token);
 
 
 
