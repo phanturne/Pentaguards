@@ -13,7 +13,6 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
     * Rock-Paper-Scissors, Roulette, Blackjack, Flip Coin, Dice
 * Trivia
 * Praise (Targeting Options)
-* Insult (Targeting Options)
 * Magic 8 Ball 
 * Moderation
 
