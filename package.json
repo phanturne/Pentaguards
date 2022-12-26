@@ -6,6 +6,7 @@
   "name": "pentaguards",
   "version": "1.0.0",
   "dependencies": {
+    "ascii-table": "^0.0.9",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "node.js": "^0.0.1-security"
