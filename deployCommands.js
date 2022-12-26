@@ -4,7 +4,7 @@ require("dotenv").config(); // Allow access to the environment variables of the 
 
 // Grab all the command files from each subdirectory of the commands directory
 const commands = [];
-const commandFolders = fs.readdirSync("./commands/");
+const commandFolders = fs.readdirSync("./Commands/");
 console.log(`Loading a total of ${commandFolders.length} categories.`);
 commandFolders.forEach(async (dir) => {
 	const folder = fs.readdirSync(`./commands/${dir}/`).filter(file => file.endsWith('.js'));

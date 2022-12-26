@@ -20,7 +20,7 @@ const client = new Client({
 client.commands = new Collection();
 
 // Return an array of file names of Javascript files in the commands directory
-const commandsPath = path.join(__dirname, 'commands');
+const commandsPath = path.join(__dirname, 'Commands');
 const commandFolders = fs.readdirSync(commandsPath);
 
 // Process slash commands
@@ -39,7 +39,7 @@ commandFolders.forEach(async (dir) => {
 })
 
 // Return an array of file names of Javascript file in the events directory
-const eventsPath = path.join(__dirname, 'events');
+const eventsPath = path.join(__dirname, 'Events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 // Process events
