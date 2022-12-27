@@ -16,8 +16,9 @@ const client = new Client({
     ],
 });
 
-// Create a collection to store slash commands
-client.commands = new Collection()
+// Create collections for client
+client.commands = new Collection();
+client.buttons = new Collection();
 client.commandsArray = [];
 
 // Process functions (events, commands)
@@ -35,6 +36,7 @@ for (const folder of functionFolders) {
 
 client.handleEvents();
 client.handleCommands();
+client.handleComponents();
 
 // Log in to Discord with your client's token
 client.login(token);

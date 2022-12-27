@@ -4,7 +4,6 @@ Pentaguards is a Discord bot that offers a range of features including a moderat
 For more info, visit [pentaguards.com](https://www.pentaguards.com).
 
 ### To Be Implemented:
-* New Profile Picture
 * Update Website
 * Economy System 
     * Store - Raffle System, Direct Purchase
@@ -18,3 +17,4 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
 
 #### Resources:
 [Discord.js Guide](https://discordjs.guide/#before-you-begin)
+[Fusion Terror Discord.js v14 Tutorial](https://www.youtube.com/playlist?list=PLv0io0WjFNn9LDsv1W4fOWygNFzY342Jm)

@@ -12,22 +12,40 @@ module.exports = {
             option.setName('version')
                 .setDescription('Version to use')
                 .setAutocomplete(true)),
-    async execute(interaction) {
-        const row = new ActionRowBuilder()
-            .addComponents(
-                new ButtonBuilder()
-                    .setCustomId('primary')
-                    .setLabel('Click me!')
-                    .setStyle(ButtonStyle.Primary),
-            );
+    async execute(interaction, client) {
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('pentaguardsWebsite')
+                .setLabel('Full Guide')
+                // .setURL('https://pentaguards.com')
+                .setStyle(ButtonStyle.Primary),
+        );
 
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle('Pentaguards TCG Guide')
             .setURL('https://discord.js.org')
-            .setDescription('Some description here');
+            .setImage(client.user.displayAvatarURL())
+            .setThumbnail(client.user.displayAvatarURL())
+            .setDescription('Some description here')
+            .addFields([
+                {
+                    name: `Field 1`,
+                    value: `Value 1`,
+                    inline: true
+                },
+                {
+                    name: `Field 2`,
+                    value: `Value 2`,
+                    inline: true
+                }
+            ]);
 
-        await interaction.reply({ ephemeral: true, embeds: [embed], components: [row] });
+        await interaction.reply({
+            ephemeral: true,
+            embeds: [embed],
+            components: [row]
+        });
     },
     // async autocomplete(interaction) {
     //     const focusedOption = interaction.options.getFocused(true);
