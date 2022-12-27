@@ -6,7 +6,10 @@
   "name": "pentaguards",
   "version": "1.0.0",
   "dependencies": {
+    "@discordjs/rest": "^1.5.0",
     "ascii-table": "^0.0.9",
+    "chalk": "^4.1.2",
+    "discord-api-types": "^0.37.24",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "node.js": "^0.0.1-security"
@@ -15,16 +18,16 @@
     "eslint": "^8.30.0"
   },
   "description": "Pentaguards is a Discord bot that offers a range of features including a moderation system with mod-mail, a customizable economy system, mini-games, and a community-run trading card game with AI-generated artwork. It also uses state-of-the-art techniques to provide personalized, uplifting experiences for users, including encouragement, inspiration, humor, and social support, fostering a positive and supportive community atmosphere.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/phanturne/Pentaguards.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Phanturne",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/phanturne/Pentaguards/issues"
