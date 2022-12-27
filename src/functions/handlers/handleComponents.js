@@ -6,15 +6,21 @@ module.exports = (client) => {
         const componentPath = `${__dirname}/../../components`
         const componentFolders = readdirSync(componentPath)
         for (const folder of componentFolders) {
-            const eventFiles = readdirSync(`${componentPath}/${folder}`)
-                .filter((file) => file.endsWith(".js"))
+            const componentFiles = readdirSync(`${componentPath}/${folder}`)
+                .filter((file) => file.endsWith(".js"));
 
-            const { buttons } = client
+            const { buttons, selectMenus } = client;
             switch (folder) {
                 case "buttons":
-                    for (const file of eventFiles) {
+                    for (const file of componentFiles) {
                         const button = require(`${componentPath}/${folder}/${file}`);
-                        buttons.set(button.data.name, button)
+                        buttons.set(button.data.name, button);
+                    }
+                    break;
+                case "selectMenus":
+                    for (const file of componentFiles) {
+                        const menu = require(`${componentPath}/${folder}/${file}`);
+                        selectMenus.set(menu.data.name, menu);
                     }
                     break;
                 default:

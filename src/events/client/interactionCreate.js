@@ -31,6 +31,15 @@ module.exports = {
             } catch (error) {
                 console.error(error);
             }
+        } else if (interaction.isStringSelectMenu()) {
+            const menu = client.selectMenus.get(interaction.customId);
+            if (!menu) return new Error('Select menu has not been set up.');
+
+            try {
+                await menu.execute(interaction, client)
+            } catch (error) {
+                console.error(error);
+            }
         }
     },
     // @ TODO: Autocomplete doesn't work for some reason

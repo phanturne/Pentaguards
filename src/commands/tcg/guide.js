@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -41,10 +41,24 @@ module.exports = {
                 }
             ]);
 
+        const menu = new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('guide-menu')
+                .setMinValues(1)
+                .setMaxValues(1)
+                .setOptions(new StringSelectMenuOptionBuilder({
+                    label: `Option 1`,
+                    value: `google.com`
+                }), new StringSelectMenuOptionBuilder({
+                    label: `Option 2`,
+                    value: `google.com2`
+                }))
+        );
+
         await interaction.reply({
             ephemeral: true,
             embeds: [embed],
-            components: [row]
+            components: [row, menu]
         });
     },
     // async autocomplete(interaction) {
