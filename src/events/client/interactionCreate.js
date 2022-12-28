@@ -1,4 +1,4 @@
-const { Events } = require('discord.js');
+const { Events, InteractionType } = require('discord.js');
 
 module.exports = {
     name: Events.InteractionCreate,
@@ -37,6 +37,15 @@ module.exports = {
 
             try {
                 await menu.execute(interaction, client)
+            } catch (error) {
+                console.error(error);
+            }
+        } else if (interaction.type == InteractionType.ModalSubmit) {
+            const modal = client.modals.get(interaction.customId);
+            if (!modal) return new Error('Modal has not been set up');
+
+            try {
+                await modal.execute(interaction, client)
             } catch (error) {
                 console.error(error);
             }
