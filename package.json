@@ -12,6 +12,7 @@
     "discord-api-types": "^0.37.24",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "give-me-a-joke": "^0.5.1",
     "node.js": "^0.0.1-security",
     "undici": "^5.14.0"
   },

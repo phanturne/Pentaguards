@@ -5,7 +5,7 @@ module.exports = {
     async execute(interaction, client) {
         if (interaction.isChatInputCommand()) {
             // Get matching command from client.commands
-            const command = interaction.client.commands.get(interaction.commandName);
+            const command = client.commands.get(interaction.commandName);
 
             // If no matching command is found, log the error to the error and ignore the event
             if (!command) {
@@ -30,6 +30,9 @@ module.exports = {
                 await button.execute(interaction, client)
             } catch (error) {
                 console.error(error);
+                await interaction.reply({
+                    content: 'There is an error with this button!',
+                    ephemeral: true });
             }
         } else if (interaction.isStringSelectMenu()) {
             const menu = client.selectMenus.get(interaction.customId);
@@ -39,6 +42,9 @@ module.exports = {
                 await menu.execute(interaction, client)
             } catch (error) {
                 console.error(error);
+                await interaction.reply({
+                    content: 'There is an error with this select menu',
+                    ephemeral: true });
             }
         } else if (interaction.type == InteractionType.ModalSubmit) {
             const modal = client.modals.get(interaction.customId);
@@ -48,6 +54,28 @@ module.exports = {
                 await modal.execute(interaction, client)
             } catch (error) {
                 console.error(error);
+                await interaction.reply({
+                    content: 'There is an error with this modal.!',
+                    ephemeral: true });
+            }
+        } else if (interaction.isContextMenuCommand()) {
+            // Get matching command from client.commands
+            const contextCommand = client.commands.get(interaction.commandName);
+
+            // If no matching command is found, log the error to the error and ignore the event
+            if (!contextCommand) {
+                console.error(`No context command matching ${interaction.commandName} was found.`);
+                return;
+            }
+
+            // Call the command's execute(). Catch any log any errors to the console.
+            try {
+                await contextCommand.execute(interaction, client);
+            } catch (error) {
+                console.error(error);
+                await interaction.reply({
+                    content: 'There is an error with this context menu!',
+                    ephemeral: true });
             }
         }
     },

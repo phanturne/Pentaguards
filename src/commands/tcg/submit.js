@@ -1,6 +1,5 @@
 const {
     SlashCommandBuilder,
-    EmbedBuilder,
     ModalBuilder,
     ActionRowBuilder,
     TextInputBuilder,
@@ -41,12 +40,14 @@ module.exports = {
             .setCustomId(`cardImage`)
             .setLabel(`Card Image URL`)
             .setRequired(true)
+            .setPlaceholder('Link the URL to a 360 x 540 px image.')
             .setStyle(TextInputStyle.Short);
 
         const comments = new TextInputBuilder()
             .setCustomId(`comments`)
-            .setLabel(`Comments`)
+            .setLabel(`Additional Information`)
             .setRequired(false)
+            .setPlaceholder('Include comments, prompt used, and/or image source.')
             .setStyle(TextInputStyle.Paragraph);
 
         const row1 = new ActionRowBuilder().addComponents(cardName);
