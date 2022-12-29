@@ -16,5 +16,5 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
 * Moderation
 
 #### Resources:
-[Discord.js Guide](https://discordjs.guide/#before-you-begin)
-[Fusion Terror Discord.js v14 Tutorial](https://www.youtube.com/playlist?list=PLv0io0WjFNn9LDsv1W4fOWygNFzY342Jm)
+- [Discord.js Guide](https://discordjs.guide/#before-you-begin)
+- [Fusion Terror Discord.js v14 Tutorial](https://www.youtube.com/playlist?list=PLv0io0WjFNn9LDsv1W4fOWygNFzY342Jm)
