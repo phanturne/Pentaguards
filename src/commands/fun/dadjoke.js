@@ -1,6 +1,5 @@
 const giveMeAJoke = require('give-me-a-joke');
-const {SlashCommandBuilder} = require("discord.js");
-const {request} = require("undici");
+const {SlashCommandBuilder, EmbedBuilder} = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,8 +7,12 @@ module.exports = {
         .setDescription("Send a random dad joke"),
     async execute(interaction, client) {
         await giveMeAJoke.getRandomDadJoke(function(joke) {
+            const embed = new EmbedBuilder()
+                .setColor(0x0099FF)
+                .setDescription(joke);
+
             interaction.reply({
-                content: joke
+                embeds: [embed],
             });
         })
     }

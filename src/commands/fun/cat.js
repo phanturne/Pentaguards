@@ -4,7 +4,7 @@ const { request } = require('undici');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('cat')
-        .setDescription('Sends a random picture of a cat'),
+        .setDescription('Sends a random cat picture.'),
     async execute(interaction, client) {
         const message = await interaction.deferReply({
             fetchReply: true,
