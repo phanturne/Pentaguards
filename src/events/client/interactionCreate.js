@@ -46,7 +46,7 @@ module.exports = {
                     content: 'There is an error with this select menu',
                     ephemeral: true });
             }
-        } else if (interaction.type == InteractionType.ModalSubmit) {
+        } else if (interaction.type === InteractionType.ModalSubmit) {
             const modal = client.modals.get(interaction.customId);
             if (!modal) return new Error('Modal has not been set up');
 
@@ -77,28 +77,22 @@ module.exports = {
                     content: 'There is an error with this context menu!',
                     ephemeral: true });
             }
+        } else if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+            // Get matching command from client.commands
+            const command = interaction.client.commands.get(interaction.commandName);
+
+            // If no matching command is found, log the error to the error and ignore the event
+            if (!command) {
+                console.error(`No command matching ${interaction.commandName} was found.`);
+                return;
+            }
+
+            // Call the command's execute(). Catch any log any errors to the console.
+            try {
+                await command.autocomplete(interaction);
+            } catch (error) {
+                console.error(error);
+            }
         }
     },
-    // @ TODO: Autocomplete doesn't work for some reason
-    // async autocomplete(interaction) {
-    //     console.log("auto");
-    //     // Ignore the event if it is not a chat input command
-    //     if (!interaction.isAutocomplete()) return;
-    //
-    //     // Get matching command from client.commands
-    //     const command = interaction.client.commands.get(interaction.commandName);
-    //
-    //     // If no matching command is found, log the error to the error and ignore the event
-    //     if (!command) {
-    //         console.error(`No command matching ${interaction.commandName} was found.`);
-    //         return;
-    //     }
-    //
-    //     // Call the command's execute(). Catch any log any errors to the console.
-    //     try {
-    //         await command.autocomplete(interaction);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // },
 };

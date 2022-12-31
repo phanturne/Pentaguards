@@ -14,6 +14,7 @@
     "dotenv": "^16.0.3",
     "give-me-a-joke": "^0.5.1",
     "node.js": "^0.0.1-security",
+    "sharp": "^0.31.3",
     "undici": "^5.14.0"
   },
   "devDependencies": {
