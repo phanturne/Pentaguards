@@ -48,7 +48,7 @@ module.exports = {
             .addFields([
                 {
                     name: `Field 1`,
-                    value: option,
+                    value: 'Value 1',
                     inline: true
                 },
                 {
