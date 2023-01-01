@@ -8,8 +8,8 @@ const { databaseToken } = process.env
 
 csvtojson()
     // CHOOSE CSV TO UPLOAD (CARDS, FRAMES, ARTISTS)
-    // .fromFile("Pentaguards Database - New Artists.csv")
-    .fromFile("Pentaguards Database - New Cards.csv")
+    .fromFile("Pentaguards Database - New Artists.csv")
+    // .fromFile("Pentaguards Database - New Cards.csv")
     .then(csvData => {
         // console.log(csvData);
 
@@ -22,9 +22,9 @@ csvtojson()
                 client
                     .db("TCG")
                     // CHOOSE COLLECTION TO UPDATE (SHOULD BE THE SAME TYPE AS THE CSV)
-                    // .collection("artists")
+                    .collection("artists")
                     // .collection("frames")
-                    .collection("cards")
+                    // .collection("cards")
                     .insertMany(csvData, (err, res) => {
                         if (err) throw err;
 
