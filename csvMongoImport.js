@@ -7,9 +7,11 @@ require("dotenv").config();
 const { databaseToken } = process.env
 
 csvtojson()
-    .fromFile("Pentaguards Database - Artists.csv")
+    // CHOOSE CSV TO UPLOAD (CARDS, FRAMES, ARTISTS)
+    // .fromFile("Pentaguards Database - New Artists.csv")
+    .fromFile("Pentaguards Database - New Cards.csv")
     .then(csvData => {
-        console.log(csvData);
+        // console.log(csvData);
 
         mongodb.connect(
             databaseToken,
@@ -19,7 +21,10 @@ csvtojson()
 
                 client
                     .db("TCG")
-                    .collection("artists")
+                    // CHOOSE COLLECTION TO UPDATE (SHOULD BE THE SAME TYPE AS THE CSV)
+                    // .collection("artists")
+                    // .collection("frames")
+                    .collection("cards")
                     .insertMany(csvData, (err, res) => {
                         if (err) throw err;
 
