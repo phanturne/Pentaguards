@@ -9,12 +9,18 @@
     "@discordjs/rest": "^1.5.0",
     "ascii-table": "^0.0.9",
     "chalk": "^4.1.2",
+    "csvtojson": "^2.0.10",
     "discord-api-types": "^0.37.24",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
+    "fast-csv": "^4.3.6",
     "give-me-a-joke": "^0.5.1",
+    "mongodb": "^4.13.0",
+    "mongoose": "^6.8.2",
+    "mz": "^2.7.0",
     "node.js": "^0.0.1-security",
     "sharp": "^0.31.3",
+    "stream-to-iterator": "^3.0.3",
     "undici": "^5.14.0"
   },
   "devDependencies": {

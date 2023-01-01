@@ -18,3 +18,4 @@ For more info, visit [pentaguards.com](https://www.pentaguards.com).
 #### Resources:
 - [Discord.js Guide](https://discordjs.guide/#before-you-begin)
 - [Fusion Terror Discord.js v14 Tutorial](https://www.youtube.com/playlist?list=PLv0io0WjFNn9LDsv1W4fOWygNFzY342Jm)
+- [Import CSV file into MongoDB collection using Node.js](https://www.bezkoder.com/node-js-csv-mongodb-collection/)
