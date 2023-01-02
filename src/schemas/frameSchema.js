@@ -11,11 +11,17 @@ const frameSchema = new Schema({
     url: String,
     filledURL: String,
     dateAdded: String,
+    left: Number,
+    right: Number,
+    top: Number,
+    bottom: Number,
     width: Number,
     length: Number,
     scale: Number,
     newWidth: Number,
     newLength: Number,
+    lengthShift: Number,
+    widthShift: Number,
 })
 
 module.exports = model("Frame", frameSchema);
