@@ -80,7 +80,6 @@ module.exports = {
                     },
                 ])
                 .toBuffer();
-            comboID += cardList[i].id;
         }
 
         await sharp(extendedImg).toFile(`${__dirname}/mergedImages/merged.png`)
