@@ -79,12 +79,12 @@ module.exports = {
             }
 
             if (row.components.length > 0) {
-                await interaction.reply({ embeds: [embed], components: [row] });
+                await interaction.reply({ embeds: [embed], components: [row]});
             } else {
                 await interaction.reply({ embeds: [embed] });
             }
         } else {
-            interaction.reply("Invalid artist ID.")
+            await interaction.reply("Invalid artist ID.")
         }
     }
 }

@@ -12,7 +12,7 @@ module.exports = {
                 .setRequired(true)),
     async execute(interaction) {
         const cardId = interaction.options.getString("id");
-        let card = await Card.findOne({id: cardId})
+        let card = await Card.findOne({id: cardId});
 
         // If it is a valid card
         if (card) {
