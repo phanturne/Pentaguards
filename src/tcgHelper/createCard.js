@@ -51,8 +51,41 @@ module.exports = {
         return finalOutput;
     },
 
-    async combineCards() {
-        return 0;
+    async combineCards(cardList) {
+        // Extend the size of the first card to fit other cards
+        // Resize card image based on the frame's new width and height
+        let extendedImg = await sharp(cardList[0])
+            .extend({
+                // Pad the image w/ invisible pixels on all sides until its the same size as before
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: cardList.length * 400,
+                background: { r: 0, g: 0, b: 0, alpha: 0 }
+            })
+            .toBuffer()
+            .catch(err => {
+                console.log("Error: ", err);
+            });
+
+        // Overlay the other cards on the extended image
+        for (let i = 1; i < cardList.length; i++) {
+            // Apply an overlay to frame-shaped card to add the actual frame on top
+            extendedImg = await sharp(extendedImg)
+                .composite([
+                    {
+                        input: cardList[i],
+                        top: 0,
+                        left: 400 * i + 20,
+                    },
+                ])
+                .toBuffer();
+            comboID += cardList[i].id;
+        }
+
+        await sharp(extendedImg).toFile(`${__dirname}/mergedImages/merged.png`)
+
+        return `${__dirname}/mergedImages/merged.png`;
     }
 }
 

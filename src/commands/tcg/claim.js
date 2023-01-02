@@ -2,9 +2,10 @@ const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const { createCard, combineCards } = require(`../../tcgHelper/createCard.js`);
-const { request } = require('undici');
-const { readFile } = require('fs/promises');
-const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
+// const { request } = require('undici');
+// const { readFile } = require('fs/promises');
+// const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
+// const joinImages = require('join-images');
 
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
@@ -33,24 +34,26 @@ module.exports = {
         }
 
         // Combine the 3 cards into 1 big image
-        // Create a pixel canvas and get its context, which will be used to modify the canvas
-        const canvas = createCanvas(1200, 540);
-        const context = canvas.getContext('2d');
-
-        // This uses the canvas dimensions to stretch the image onto the entire canvas
-        const background = await loadImage("https://upload.wikimedia.org/wikipedia/commons/8/89/HD_transparent_picture.png")
-        context.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-        // Add the cards onto the main canvas
-        for (let i = 0; i < 3; i++) {
-            const canvasCard = await readFile(newCards[i]);
-            const cardImage = new Image();
-            cardImage.src = canvasCard;
-            context.drawImage(cardImage, 400 * i, 0, 360, 540);
-        }
+        // // Create a pixel canvas and get its context, which will be used to modify the canvas
+        // const canvas = createCanvas(1200, 540);
+        // const context = canvas.getContext('2d');
+        //
+        // // This uses the canvas dimensions to stretch the image onto the entire canvas
+        // const background = await loadImage("https://upload.wikimedia.org/wikipedia/commons/8/89/HD_transparent_picture.png")
+        // context.drawImage(background, 0, 0, canvas.width, canvas.height);
+        //
+        // // Add the cards onto the main canvas
+        // for (let i = 0; i < 3; i++) {
+        //     const canvasCard = await readFile(newCards[i]);
+        //     const cardImage = new Image();
+        //     cardImage.src = canvasCard;
+        //     context.drawImage(cardImage, 400 * i, 0, 360, 540);
+        // }
 
         // Use the helpful Attachment class structure to process the file for you
-        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'cards.png' });
+        // const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'cards.png' });
+
+        const attachment = new AttachmentBuilder(await combineCards(newCards), { name: 'cards.png'});
 
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
