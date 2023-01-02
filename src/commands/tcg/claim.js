@@ -32,16 +32,16 @@ module.exports = {
 
         // Create a 700x250 pixel canvas and get its context
         // The context will be used to modify the canvas
-        const canvas = Canvas.createCanvas(360, 540);
-        const context = canvas.getContext('2d');
-
-        const background = await Canvas.loadImage(newCards[0]);
-
-        // This uses the canvas dimensions to stretch the image onto the entire canvas
-        context.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-        // Use the helpful Attachment class structure to process the file for you
-        const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'profile-image.png' });
+        // const canvas = Canvas.createCanvas(360, 540);
+        // const context = canvas.getContext('2d');
+        //
+        // const background = await Canvas.loadImage(newCards[0]);
+        //
+        // // This uses the canvas dimensions to stretch the image onto the entire canvas
+        // context.drawImage(background, 0, 0, canvas.width, canvas.height);
+        //
+        // // Use the helpful Attachment class structure to process the file for you
+        // const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'profile-image.png' });
 
         // interaction.editReply({ files: [attachment] });
 
@@ -49,19 +49,20 @@ module.exports = {
 
         // Combine the 3 cards into 1 big image
         // const finalImage = combineCards(newCards);
-        const finalImage = newCards[0];
+        const finalImage = `{attachment://${newCards[0]}`;
 
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle('Claim a Card')
             .setDescription(`You may choose 1 card. React with the respective emoji to claim it`)
-            // .setImage(finalImage)
+            .setImage(finalImage)
             .setThumbnail(interaction.user.avatarURL())
             .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL()});
 
+        const file = new AttachmentBuilder(newCards[0]);
         await interaction.editReply({
             embeds: [embed],
+            files: [file]
         });
-        await interaction.followUp({files: [attachment]})
     }
 }

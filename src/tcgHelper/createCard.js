@@ -38,24 +38,6 @@ module.exports = {
             }])
             .toBuffer();
 
-        // await sharp(filledBorderPath)
-        //     .toBuffer({ resolveWithObject: true })
-        //     .then(({ data, info }) => {
-        //         composite = sharp(resizedImg)
-        //             .composite([{
-        //                 input: data,
-        //                 blend: "dest-atop"
-        //             }])
-        //             .toBuffer();
-        //             // .toFile(`${__dirname}/temp/composite.png`, function(err) {
-        //             //     console.log("Error: ", err)
-        //             // });
-        //         console.log(info);
-        //     })
-        //     .catch(err => {
-        //         console.log("Error: ", err);
-        //     });
-
         // Apply an overlay to frame-shaped card to add the actual frame on top
         await sharp(composite)
             .composite([
