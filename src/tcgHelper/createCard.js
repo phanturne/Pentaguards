@@ -16,10 +16,10 @@ module.exports = {
             })
             .extend({
                 // Pad the image w/ invisible pixels on all sides until its the same size as before
-                top: Math.ceil((540 - newLength) / 2),
-                bottom: Math.floor((540 - newLength) / 2),
-                left: Math.ceil((360 - newWidth) / 2),
-                right: Math.floor((360 - newWidth) / 2),
+                top: Math.ceil((540 - newLength) / 2) - lengthShift,
+                bottom: Math.floor((540 - newLength) / 2) + lengthShift,
+                left: Math.ceil((360 - newWidth) / 2) - widthShift,
+                right: Math.floor((360 - newWidth) / 2) + widthShift,
                 background: { r: 0, g: 0, b: 0, alpha: 0 }
             })
             .toBuffer()
@@ -32,8 +32,8 @@ module.exports = {
             .composite([{
                 input: filledBorderPath,
                 blend: "dest-atop",
-                top: lengthShift,
-                left: widthShift,
+                top: 0,
+                left: 0,
             }])
             .toBuffer();
 
@@ -42,8 +42,8 @@ module.exports = {
             .composite([
                 {
                     input: borderPath,
-                    top: lengthShift,
-                    left: widthShift,
+                    top: 0,
+                    left: 0,
                 },
             ])
             .toFile(finalOutput);
