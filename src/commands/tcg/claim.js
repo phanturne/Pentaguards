@@ -22,36 +22,19 @@ module.exports = {
         // Apply frames onto the 3 cards
         const newCards = []
         for (let i = 0; i < 3; i++) {
-            newCards.push(
-                await createCard(cards[i].id + borders[i].id,
+            newCards.push(new AttachmentBuilder(
+                await createCard(
+                    cards[i].id + borders[i].id,
                     cards[i].id,
                     borders[i].id,
                     borders[i].newWidth,
                     borders[i].newLength,
                     borders[i].lengthShift,
                     borders[i].widthShift,
+                ),
+                {name: `card${i}.png`}
             ));
         }
-
-        // Combine the 3 cards into 1 big image
-        // // Create a pixel canvas and get its context, which will be used to modify the canvas
-        // const canvas = createCanvas(1200, 540);
-        // const context = canvas.getContext('2d');
-        //
-        // // This uses the canvas dimensions to stretch the image onto the entire canvas
-        // const background = await loadImage("https://upload.wikimedia.org/wikipedia/commons/8/89/HD_transparent_picture.png")
-        // context.drawImage(background, 0, 0, canvas.width, canvas.height);
-        //
-        // // Add the cards onto the main canvas
-        // for (let i = 0; i < 3; i++) {
-        //     const canvasCard = await readFile(newCards[i]);
-        //     const cardImage = new Image();
-        //     cardImage.src = canvasCard;
-        //     context.drawImage(cardImage, 400 * i, 0, 360, 540);
-        // }
-
-        // Use the helpful Attachment class structure to process the file for you
-        // const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'cards.png' });
 
         const attachment = new AttachmentBuilder(await combineCards(newCards), { name: 'cards.png'});
 

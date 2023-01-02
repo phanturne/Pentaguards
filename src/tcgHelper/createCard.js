@@ -6,7 +6,6 @@ module.exports = {
         const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
         const borderPath = `${__dirname}/../../assets/frames/${borderId}.png`;
         const filledBorderPath = `${__dirname}/../../assets/filledFrames/${borderId}.png`;
-        const finalOutput = `${__dirname}/cardCombos/${comboID}.png`;
 
         // Resize card image based on the frame's new width and height
         const resizedImg = await sharp(cardPath)
@@ -32,29 +31,23 @@ module.exports = {
             .composite([{
                 input: filledBorderPath,
                 blend: "dest-atop",
-                top: 0,
-                left: 0,
             }])
             .toBuffer();
 
         // Apply an overlay to frame-shaped card to add the actual frame on top
-        await sharp(composite)
+        return await sharp(composite)
             .composite([
                 {
                     input: borderPath,
-                    top: 0,
-                    left: 0,
                 },
             ])
-            .toFile(finalOutput);
-
-        return finalOutput;
+            .toBuffer();
     },
 
     async combineCards(cardList) {
         // Extend the size of the first card to fit other cards
         // Resize card image based on the frame's new width and height
-        let extendedImg = await sharp(cardList[0])
+        let extendedImg = await sharp(cardList[0].attachment)
             .extend({
                 // Pad the image w/ invisible pixels on all sides until its the same size as before
                 top: 0,
@@ -74,7 +67,7 @@ module.exports = {
             extendedImg = await sharp(extendedImg)
                 .composite([
                     {
-                        input: cardList[i],
+                        input: cardList[i].attachment,
                         top: 0,
                         left: 400 * i + 20,
                     },
@@ -82,9 +75,7 @@ module.exports = {
                 .toBuffer();
         }
 
-        await sharp(extendedImg).toFile(`${__dirname}/mergedImages/merged.png`)
-
-        return `${__dirname}/mergedImages/merged.png`;
+        return extendedImg;
     }
 }
 
