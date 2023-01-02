@@ -1,18 +1,16 @@
 const sharp = require('sharp')
 
 module.exports = {
-    async createCard(comboID, cardId, borderId, newWidth, newLength) {
+    async createCard(comboID, cardId, borderId, newWidth, newLength, lengthShift, widthShift) {
         // Calculate the file names
         const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
         const borderPath = `${__dirname}/../../assets/frames/${borderId}.png`;
         const filledBorderPath = `${__dirname}/../../assets/filledFrames/${borderId}.png`;
-        const finalOutput = `${__dirname}/${comboID}.png`;
+        const finalOutput = `${__dirname}/cardCombos/${comboID}.png`;
 
         // Resize card image based on the frame's new width and height
         const resizedImg = await sharp(cardPath)
             .resize({
-                fit: sharp.fit.contain,
-                withoutEnlargement: true,
                 width: newWidth,
                 height: newLength,
             })
@@ -24,7 +22,6 @@ module.exports = {
                 right: Math.floor((360 - newWidth) / 2),
                 background: { r: 0, g: 0, b: 0, alpha: 0 }
             })
-            // .toFile(`cardCombos/${comboID}-resized`)
             .toBuffer()
             .catch(err => {
                 console.log("Error: ", err);
@@ -34,7 +31,9 @@ module.exports = {
         let composite = await sharp(resizedImg)
             .composite([{
                 input: filledBorderPath,
-                blend: "dest-atop"
+                blend: "dest-atop",
+                top: lengthShift,
+                left: widthShift,
             }])
             .toBuffer();
 
@@ -43,8 +42,8 @@ module.exports = {
             .composite([
                 {
                     input: borderPath,
-                    top: 0,
-                    left: 0,
+                    top: lengthShift,
+                    left: widthShift,
                 },
             ])
             .toFile(finalOutput);
