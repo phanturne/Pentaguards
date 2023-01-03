@@ -15,6 +15,8 @@ const frameSchema = new Schema({
     finalLength: Number,
     lengthShift: Number,
     widthShift: Number,
+    cardRatio: Number,
+    finalRatio: Number,
 })
 
 module.exports = model("Frame", frameSchema);

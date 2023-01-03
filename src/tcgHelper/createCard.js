@@ -2,10 +2,10 @@ const sharp = require('sharp')
 
 module.exports = {
     async createCard(comboID, cardId, borderId, newWidth, newLength, lengthShift, widthShift) {
-        // const padtop = Math.ceil((540 - newLength) / 2) - lengthShift
-        // const padbottom = Math.floor((540 - newLength) / 2) + lengthShift
-        // const padleft = Math.ceil((360 - newWidth) / 2) - widthShift
-        // const padright = Math.floor((360 - newWidth) / 2) + widthShift
+        const padTop = Math.ceil((540 - newLength) / 2 - lengthShift);
+        const padBottom = Math.floor((540 - newLength) / 2 + lengthShift);
+        const padLeft = Math.ceil((360 - newWidth) / 2 - widthShift);
+        const padRight = Math.floor((360 - newWidth) / 2 + widthShift);
 
         // Calculate the file names
         const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
@@ -20,15 +20,10 @@ module.exports = {
             })
             .extend({
                 // Pad the image w/ invisible pixels on all sides until its the same size as before
-                top: Math.ceil((540 - newLength) / 2) - lengthShift,
-                bottom: Math.floor((540 - newLength) / 2) + lengthShift,
-                left: Math.ceil((360 - newWidth) / 2) - widthShift,
-                right: Math.floor((360 - newWidth) / 2) + widthShift,
-                // top: Math.ceil((540 - newLength) / 2),
-                // bottom: Math.floor((540 - newLength) / 2),
-                // left: Math.ceil((360 - newWidth) / 2),
-                // right: Math.floor((360 - newWidth) / 2),
-                // background: { r: 0, g: 0, b: 0, alpha: 0 }
+                top: padTop,
+                bottom: padBottom,
+                left: padLeft,
+                right: padRight,
             })
             .toBuffer()
             .catch(err => {

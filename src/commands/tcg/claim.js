@@ -2,10 +2,9 @@ const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const { createCard, combineCards } = require(`../../tcgHelper/createCard.js`);
-// const { request } = require('undici');
-// const { readFile } = require('fs/promises');
-// const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
-// const joinImages = require('join-images');
+const { request } = require('undici');
+const { readFile } = require('fs/promises');
+const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
 
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
@@ -22,21 +21,47 @@ module.exports = {
         // Apply frames onto the 3 cards
         const newCards = []
         for (let i = 0; i < 3; i++) {
-            newCards.push(new AttachmentBuilder(
-                await createCard(
-                    cards[i].id + borders[i].id,
-                    cards[i].id,
-                    borders[i].id,
-                    300,
-                    450,
-                    borders[i].lengthShift,
-                    borders[i].widthShift,
-                ),
-                {name: `card${i}.png`}
-            ));
+            // newCards.push(new AttachmentBuilder(
+            //     await createCard(
+            //         cards[i].id + borders[i].id,
+            //         cards[i].id,
+            //         borders[i].id,
+            //         Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
+            //         Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
+            //         borders[i].lengthShift,
+            //         borders[i].widthShift,
+            //     ),
+            //     {name: `card${i}.png`}
+            // ));
+            newCards.push(await createCard(
+                cards[i].id + borders[i].id,
+                cards[i].id,
+                borders[i].id,
+                Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
+                Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
+                borders[i].lengthShift,
+                borders[i].widthShift,
+            ))
         }
 
-        const attachment = new AttachmentBuilder(await combineCards(newCards), { name: 'cards.png'});
+        // Create a pixel canvas and get its context, which will be used to modify the canvas
+        const canvas = createCanvas(1200, 540);
+        const context = canvas.getContext('2d');
+
+        // This uses the canvas dimensions to stretch the image onto the entire canvas
+        const background = await loadImage("https://upload.wikimedia.org/wikipedia/commons/8/89/HD_transparent_picture.png")
+        context.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+        // Add the cards onto the main canvas
+        for (let i = 0; i < 3; i++) {
+            const cardBuffer = await loadImage(newCards[i]);
+            context.drawImage(cardBuffer, 400 * i, 0, 360, 540);
+        }
+
+        // Use the helpful Attachment class structure to process the file for you
+        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'cards.png' });
+
+        // const attachment = new AttachmentBuilder(await combineCards(newCards), { name: 'cards.png'});
 
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
