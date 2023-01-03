@@ -2,13 +2,17 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('kick')
-        .setDescription('Kicks the member provided.')
+        .setName('timeout')
+        .setDescription('Timeouts the member provided.')
         .addUserOption(option =>
             option
                 .setName('user')
-                .setDescription('The member to kick')
+                .setDescription('The member to timeout')
                 .setRequired(true))
+        .addIntegerOption(option =>
+            option
+                .setName("duration")
+                .setDescription("Timeout duration"))
         .addStringOption(option =>
             option
                 .setName('reason')
@@ -17,20 +21,13 @@ module.exports = {
         .setDMPermission(false),
     async execute(interaction) {
         const member = interaction.options.getMember('user');
+        const duration = interaction.options.getInteger('duration') ?? null;
         const reason = interaction.options.getString('reason') ?? 'Unspecified';
 
-        if (!member) return interaction.reply({
-            content: "That was not a valid member.",
-            ephemeral: true,
-        });
-
+        await member.timeout(!duration ? null : duration * 60 * 1000, reason).catch(console.error);
         await member.user.send({
-            content: `You have been kicked from ${interaction.guild.name}!\nReason: ${reason}`
+            content: `You have been timed out in ${interaction.guild.name}!\nReason: ${reason}`
         }).catch(console.error);
-
-        await interaction.reply(`Kicking ${member.user.username} for reason: ${reason}`);
-        await member.kick()
-            .then()
-            .catch(console.error);
+        await interaction.reply(`Timed out ${member.user.username} for reason: ${reason}`).catch(console.error);
     },
 };
