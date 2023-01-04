@@ -1,10 +1,12 @@
 const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
+const Profile = require(`../../schemas/profileSchema.js`);
+const UniqueID = require(`../../schemas/uniqueIDSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const { createCard, combineCards } = require(`../../tcgHelper/createCard.js`);
 const { request } = require('undici');
-const { readFile } = require('fs/promises');
 const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
+const mongoose = require("mongoose");
 
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
@@ -14,6 +16,12 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
+        // Get the player
+        let player = await Profile.findOne( { id: interaction.user.id })
+
+        if (!player) return interaction.editReply("Please set up an account by typing `/tcg`.");
+
+        // @TODO: move card generation to tcgHelper
         // Randomly pick 3 cards and 3 borders
         const cards = await Card.aggregate([{ $sample: { size: 3 } }]);
         const borders = await Frame.aggregate([{ $sample: { size: 3 } }]);
@@ -71,9 +79,60 @@ module.exports = {
             .setThumbnail(interaction.user.avatarURL())
             .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL()});
 
-        await interaction.editReply({
+        const message = await interaction.editReply({
             embeds: [embed],
             files: [attachment]
+        });
+
+        // React to the message with the "selection" emojis
+        const validEmojis = new Map([['1️⃣', 0], ['2️⃣', 1], ['3️⃣', 2]]);
+        for (let emoji of validEmojis.keys()) {
+            await message.react(emoji);
+        }
+        let playerChoice;
+
+        // Create an emoji collector to collect the user's choice
+        const filter = (reaction, user) => {
+            playerChoice = reaction;
+            return validEmojis.includes(reaction.emoji.name) && user.id === interaction.user.id;
+        };
+
+        // Update the card's drop count
+        for (const card of cards) {
+            Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
+        }
+
+        const collector = message.createReactionCollector({ filter, max: 1, time: 1000 * 60 * 5});
+
+        collector.on('collect', (reaction, user) => {
+            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+            // Add the card to the user's profile
+            const card = cards[validEmojis[playerChoice]];
+            const newID = `${card.id}${card.printNumber + 1}`;
+            const border = borders[validEmojis[playerChoice]];
+            player.cardsList.push(newID);
+            player.save().catch(console.error);
+
+            // Add the card to the unique IDs database
+            const uniqueCard = new UniqueID({
+                _id: mongoose.Types.ObjectId(),
+                id: newID,
+                cardID: card.id,
+                printNumber: card.printNumber + 1,
+                condition: "N/A",
+                frame: border.name,
+            })
+
+            // Update card's print total
+            card.claimCount += 1;
+            card.save().catch(console.error);
+
+            interaction.followUp(`You have successfully claimed \`Card #${newID}\``);
+            //@TODO: include card info
+        });
+
+        collector.on('end', collected => {
+            if (collected.size == 0) interaction.followUp("No cards have been claimed")
         });
     }
 }

@@ -31,12 +31,12 @@ module.exports = {
                 .setImage(card.url)
                 .addFields([
                     {
-                        name: `Date Added\u1CBC\u1CBC`,
+                        name: `Date Added      \u200B`,
                         value: card.dateAdded,
                         inline: true,
                     },
                     {
-                        name: `Card ID\u1CBC\u1CBC\u1CBC\u1CBC\u1CBC`,
+                        name: `Card ID`,
                         value: `#${card.id}`,
                         inline: true,
                     },
@@ -46,7 +46,7 @@ module.exports = {
                         inline: true,
                     },
                     {
-                        name: `Style`,
+                        name: `Style   \u200B`,
                         value: card.style,
                         inline: true,
                     },
@@ -62,12 +62,12 @@ module.exports = {
                     },
                     {
                         name: `Artist`,
-                        value: `${card.artist}\u1CBC\u1CBC`,
+                        value: `${card.artist}`,
                         inline: true,
                     },
                     {
-                        name: `AI Model`,
-                        value: card.aiModel ? card.aiModel : "Unknown",
+                        name: `AI Model         \u200B`,
+                        value: card.aiModel ? `${card.aiModel}` : "Unknown",
                         inline: true,
                     },
                     {

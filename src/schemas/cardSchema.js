@@ -13,6 +13,10 @@ const cardSchema = new Schema({
     url: String,
     fullArt: String,
     dateAdded: String,
+    dropCount: Number,
+    claimCount: Number,
+    wishlistCount: Number,
+    scrapCount: Number,
 })
 
 module.exports = model("Card", cardSchema);
