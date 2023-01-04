@@ -1,11 +1,11 @@
+const Profile = require(`../../schemas/profileSchema.js`);
 const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
-const Profile = require(`../../schemas/profileSchema.js`);
-const UniqueID = require(`../../schemas/uniqueIDSchema.js`);
-const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require("discord.js");
-const { createCard, combineCards } = require(`../../tcgHelper/createCard.js`);
+const { SlashCommandBuilder, EmbedBuilder} = require("discord.js");
+const { cardDropImage } = require(`../../tcgHelper/cardDropImage.js`);
+const { createClaimCardCollector } = require(`../../tcgHelper/createPickCardCollector.js`);
 const { request } = require('undici');
-const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
+
 const mongoose = require("mongoose");
 
 // @TODO: Allow users to claim cards and add into their collection
@@ -16,65 +16,25 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        // Get the player
+        // Get the player profile. Return if the player doesn't exist.
         let player = await Profile.findOne( { id: interaction.user.id })
-
         if (!player) return interaction.editReply("Please set up an account by typing `/tcg`.");
 
-        // @TODO: move card generation to tcgHelper
-        // Randomly pick 3 cards and 3 borders
-        const cards = await Card.aggregate([{ $sample: { size: 3 } }]);
-        const borders = await Frame.aggregate([{ $sample: { size: 3 } }]);
+        // Set the number of cards to be generated and claimed, based on the user's status
+        const numCards = 3;
+        const numClaim = 1;
 
-        // Apply frames onto the 3 cards
-        const newCards = []
-        for (let i = 0; i < 3; i++) {
-            // newCards.push(new AttachmentBuilder(
-            //     await createCard(
-            //         cards[i].id + borders[i].id,
-            //         cards[i].id,
-            //         borders[i].id,
-            //         Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
-            //         Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
-            //         borders[i].lengthShift,
-            //         borders[i].widthShift,
-            //     ),
-            //     {name: `card${i}.png`}
-            // ));
-            newCards.push(await createCard(
-                cards[i].id + borders[i].id,
-                cards[i].id,
-                borders[i].id,
-                Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
-                Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
-                borders[i].lengthShift,
-                borders[i].widthShift,
-            ))
-        }
+        // Randomly pick cards and borders
+        const cards = await Card.aggregate([{ $sample: { size: numCards } }]);
+        const borders = await Frame.aggregate([{ $sample: { size: numCards } }]);
 
-        // Create a pixel canvas and get its context, which will be used to modify the canvas
-        const canvas = createCanvas(1200, 540);
-        const context = canvas.getContext('2d');
-
-        // This uses the canvas dimensions to stretch the image onto the entire canvas
-        const background = await loadImage("https://upload.wikimedia.org/wikipedia/commons/8/89/HD_transparent_picture.png")
-        context.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-        // Add the cards onto the main canvas
-        for (let i = 0; i < 3; i++) {
-            const cardBuffer = await loadImage(newCards[i]);
-            context.drawImage(cardBuffer, 400 * i, 0, 360, 540);
-        }
-
-        // Use the helpful Attachment class structure to process the file for you
-        const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'cards.png' });
-
-        // const attachment = new AttachmentBuilder(await combineCards(newCards), { name: 'cards.png'});
-
+        // Create the combined image and send it in an embed
+        const attachment = await cardDropImage(numCards, cards, borders);
+        const claimAmountString = numClaim > 1 ? `${numClaim} cards` : `${numClaim} card`;
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
-            .setTitle('Claim a Card')
-            .setDescription(`You may choose 1 card. React with the respective emoji to claim it`)
+            .setTitle(`Claim ${claimAmountString}`)
+            .setDescription(`You may pick **${claimAmountString}**. React with the respective position emoji to claim.`)
             .setImage(`attachment://cards.png`)
             .setThumbnail(interaction.user.avatarURL())
             .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL()});
@@ -84,63 +44,8 @@ module.exports = {
             files: [attachment]
         });
 
-        // React to the message with the "selection" emojis
-        const validEmojis = new Map([['1️⃣', 0], ['2️⃣', 1], ['3️⃣', 2]]);
-        for (let emoji of validEmojis.keys()) {
-            await message.react(emoji);
-        }
-        let playerChoice;
+        // Create a reaction collector that processes the actual claiming of the card
+        await createClaimCardCollector(message, interaction, numCards, numClaim, cards, borders, player);
 
-        // Create an emoji collector to collect the user's choice
-        const filter = (reaction, user) => {
-            playerChoice = reaction.emoji.name;
-            return validEmojis.has(reaction.emoji.name) && user.id === interaction.user.id;
-        };
-
-        // Update the card's drop count
-        for (const card of cards) {
-            await Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
-        }
-
-        const collector = message.createReactionCollector({ filter, max: 1, time: 1000 * 60 * 5});
-
-        async function helper() {
-            console.log("hi");
-        }
-
-        let card;
-        await collector.on('collect', (reaction, user) => {
-            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
-            const choice = validEmojis.get(playerChoice);
-            card = cards[choice];
-            const newID = `${card.id}${card.claimCount + 1}`;
-            const border = borders[choice];
-
-            // Add the card to the user's profile
-            player.cardsList.push(newID);
-            player.save().catch(console.error);
-
-            // Add the card to the unique IDs database
-            const uniqueCard = new UniqueID({
-                _id: mongoose.Types.ObjectId(),
-                id: newID,
-                cardID: card.id,
-                claimCount: card.claimCount + 1,
-                condition: "N/A",
-                frame: border.name,
-            })
-            uniqueCard.save().catch(console.error);
-
-            // Update card's print count
-            Card.updateOne( { id: card.id }, { claimCount: card.claimCount + 1})
-                .exec();
-
-            // @TODO: Include a follow up that shows card info, like in /card
-            interaction.followUp(`You have successfully claimed \`Card #${newID}\``);
-        })
-
-        collector.on('end', collected => {
-            if (collected.size == 0) interaction.followUp("No cards have been claimed")
-        });
     }
 }

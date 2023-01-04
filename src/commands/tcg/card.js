@@ -14,7 +14,7 @@ module.exports = {
         const cardId = interaction.options.getString("id");
         let card = await Card.findOne({id: cardId});
 
-        // If it is a valid card
+        // Create the card embed if it exists. Otherwise reply with an error message
         if (card) {
             let embed = new EmbedBuilder()
                 .setColor(0x0099FF)
