@@ -17,6 +17,7 @@
     "fast-csv": "^4.3.6",
     "give-me-a-joke": "^0.5.1",
     "mongodb": "^4.13.0",
+    "mongoimport": "^1.0.6",
     "mongoose": "^6.8.2",
     "mz": "^2.7.0",
     "node.js": "^0.0.1-security",
