@@ -16,15 +16,6 @@ module.exports = {
 
         // If it is a valid card
         if (card) {
-            // Create a button for the full artwork if it is provided
-            // let row = new ActionRowBuilder();
-            // if (card.prompt) {
-            //     row.addComponents(new ButtonBuilder()
-            //             .setLabel(card.prompt)
-            //             .setURL(card.fullArt)
-            //             .setStyle(ButtonStyle.Link));
-            // }
-
             let embed = new EmbedBuilder()
                 .setColor(0x0099FF)
                 .setTitle(card.name)

@@ -93,23 +93,30 @@ module.exports = {
 
         // Create an emoji collector to collect the user's choice
         const filter = (reaction, user) => {
-            playerChoice = reaction;
-            return validEmojis.includes(reaction.emoji.name) && user.id === interaction.user.id;
+            playerChoice = reaction.emoji.name;
+            return validEmojis.has(reaction.emoji.name) && user.id === interaction.user.id;
         };
 
         // Update the card's drop count
         for (const card of cards) {
-            Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
+            await Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
         }
 
         const collector = message.createReactionCollector({ filter, max: 1, time: 1000 * 60 * 5});
 
-        collector.on('collect', (reaction, user) => {
+        async function helper() {
+            console.log("hi");
+        }
+
+        let card;
+        await collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+            const choice = validEmojis.get(playerChoice);
+            card = cards[choice];
+            const newID = `${card.id}${card.claimCount + 1}`;
+            const border = borders[choice];
+
             // Add the card to the user's profile
-            const card = cards[validEmojis[playerChoice]];
-            const newID = `${card.id}${card.printNumber + 1}`;
-            const border = borders[validEmojis[playerChoice]];
             player.cardsList.push(newID);
             player.save().catch(console.error);
 
@@ -118,18 +125,19 @@ module.exports = {
                 _id: mongoose.Types.ObjectId(),
                 id: newID,
                 cardID: card.id,
-                printNumber: card.printNumber + 1,
+                claimCount: card.claimCount + 1,
                 condition: "N/A",
                 frame: border.name,
             })
+            uniqueCard.save().catch(console.error);
 
-            // Update card's print total
-            card.claimCount += 1;
-            card.save().catch(console.error);
+            // Update card's print count
+            Card.updateOne( { id: card.id }, { claimCount: card.claimCount + 1})
+                .exec();
 
+            // @TODO: Include a follow up that shows card info, like in /card
             interaction.followUp(`You have successfully claimed \`Card #${newID}\``);
-            //@TODO: include card info
-        });
+        })
 
         collector.on('end', collected => {
             if (collected.size == 0) interaction.followUp("No cards have been claimed")
