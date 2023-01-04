@@ -5,8 +5,10 @@ const uniqueIDSchema = new Schema({
     id: String,
     cardID: String,
     printNumber: Number,
+    ownerID: String,
+    ownerName: String,
     condition: String,
-    frame: String,
+    frameID: String,
 })
 
 module.exports = model("UniqueID", uniqueIDSchema);

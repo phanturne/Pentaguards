@@ -6,8 +6,6 @@ const { cardDropImage } = require(`../../tcgHelper/cardDropImage.js`);
 const { createClaimCardCollector } = require(`../../tcgHelper/createPickCardCollector.js`);
 const { request } = require('undici');
 
-const mongoose = require("mongoose");
-
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
     data: new SlashCommandBuilder()
@@ -24,12 +22,12 @@ module.exports = {
         const numCards = 3;
         const numClaim = 1;
 
-        // Randomly pick cards and borders
+        // Randomly pick cards and frames
         const cards = await Card.aggregate([{ $sample: { size: numCards } }]);
-        const borders = await Frame.aggregate([{ $sample: { size: numCards } }]);
+        const frames = await Frame.aggregate([{ $sample: { size: numCards } }]);
 
         // Create the combined image and send it in an embed
-        const attachment = await cardDropImage(numCards, cards, borders);
+        const attachment = await cardDropImage(numCards, cards, frames);
         const claimAmountString = numClaim > 1 ? `${numClaim} cards` : `${numClaim} card`;
         const embed = new EmbedBuilder()
             .setColor(0x0099FF)
@@ -45,7 +43,7 @@ module.exports = {
         });
 
         // Create a reaction collector that processes the actual claiming of the card
-        await createClaimCardCollector(message, interaction, numCards, numClaim, cards, borders, player);
+        await createClaimCardCollector(message, interaction, numCards, numClaim, cards, frames, player);
 
     }
 }

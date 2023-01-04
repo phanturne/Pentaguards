@@ -3,30 +3,30 @@ const { AttachmentBuilder } = require("discord.js");
 const {createCard} = require("./createCard");
 
 module.exports = {
-    async cardDropImage(numCards, cards, borders) {
+    async cardDropImage(numCards, cards, frames) {
         // Apply frames onto the cards
         const newCards = []
         for (let i = 0; i < numCards; i++) {
             // newCards.push(new AttachmentBuilder(
             //     await createCard(
-            //         cards[i].id + borders[i].id,
+            //         cards[i].id + frames[i].id,
             //         cards[i].id,
-            //         borders[i].id,
-            //         Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
-            //         Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
-            //         borders[i].lengthShift,
-            //         borders[i].widthShift,
+            //         frames[i].id,
+            //         Math.round(frames[i].cardRatio * 360 * frames[i].finalRatio),
+            //         Math.round(frames[i].cardRatio * 540 * frames[i].finalRatio),
+            //         frames[i].lengthShift,
+            //         frames[i].widthShift,
             //     ),
             //     {name: `card${i}.png`}
             // ));
             newCards.push(await createCard(
-                cards[i].id + borders[i].id,
+                cards[i].id + frames[i].id,
                 cards[i].id,
-                borders[i].id,
-                Math.round(borders[i].cardRatio * 360 * borders[i].finalRatio),
-                Math.round(borders[i].cardRatio * 540 * borders[i].finalRatio),
-                borders[i].lengthShift,
-                borders[i].widthShift,
+                frames[i].id,
+                Math.round(frames[i].cardRatio * 360 * frames[i].finalRatio),
+                Math.round(frames[i].cardRatio * 540 * frames[i].finalRatio),
+                frames[i].lengthShift,
+                frames[i].widthShift,
             ))
         }
 

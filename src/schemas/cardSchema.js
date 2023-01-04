@@ -9,6 +9,7 @@ const cardSchema = new Schema({
     category: String,
     group: String,
     artist: String,
+    artistID: String,
     aiModel: String,
     url: String,
     fullArt: String,

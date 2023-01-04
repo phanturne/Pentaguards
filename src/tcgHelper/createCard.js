@@ -1,7 +1,7 @@
 const sharp = require('sharp')
 
 module.exports = {
-    async createCard(comboID, cardId, borderId, newWidth, newLength, lengthShift, widthShift) {
+    async createCard(comboID, cardId, frameId, newWidth, newLength, lengthShift, widthShift) {
         const padTop = Math.ceil((540 - newLength) / 2 - lengthShift);
         const padBottom = Math.floor((540 - newLength) / 2 + lengthShift);
         const padLeft = Math.ceil((360 - newWidth) / 2 - widthShift);
@@ -9,8 +9,8 @@ module.exports = {
 
         // Calculate the file names
         const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
-        const borderPath = `${__dirname}/../../assets/frames/${borderId}.png`;
-        const filledBorderPath = `${__dirname}/../../assets/filledFrames/${borderId}.png`;
+        const framePath = `${__dirname}/../../assets/frames/${frameId}.png`;
+        const filledFramePath = `${__dirname}/../../assets/filledFrames/${frameId}.png`;
 
         // Resize card image based on the frame's new width and height
         const resizedImg = await sharp(cardPath)
@@ -33,7 +33,7 @@ module.exports = {
         // Apply an overlay to get the card in the shape of the filled frame
         let composite = await sharp(resizedImg)
             .composite([{
-                input: filledBorderPath,
+                input: filledFramePath,
                 blend: "dest-atop",
             }])
             .toBuffer();
@@ -42,7 +42,7 @@ module.exports = {
         return await sharp(composite)
             .composite([
                 {
-                    input: borderPath,
+                    input: framePath,
                 },
             ])
             .toBuffer();
