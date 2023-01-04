@@ -1,12 +1,41 @@
-const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const Profile = require(`../../schemas/profileSchema.js`);
+const mongoose = require("mongoose");
 
 module.exports = {
-    data: new ContextMenuCommandBuilder()
+    data: new SlashCommandBuilder()
         .setName('tcg')
-        .setType(ApplicationCommandType.User),
+        .setDescription('Display the user\'s profile.')
+        .addUserOption(option => option.setName('target').setDescription('The user\'s avatar to show')),
     async execute(interaction, client) {
-        await interaction.reply({
-            content: `${interaction.targetUser.displayAvatarURL()}`
-        })
+        let player = await Profile.findOne( { id: interaction.user.id })
+        // @TODO: Respond with a button that sets up the player profile
+        if (!player) {
+            const date = new Date()
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+
+            player = await new Profile({
+                _id: mongoose.Types.ObjectId(),
+                id: interaction.user.id,
+                name: interaction.user.username,
+                dateJoined: `${day}/${month}/${year}`,
+                guild: "N/A",
+                silver: 0,
+                gold: 0,
+                diamond: 0,
+                dust: 0,
+                wishlist: [],
+                cardsList: [],
+            })
+
+            await player.save().catch(console.error);
+            await interaction.reply({
+                content: `Successfully set up profile for ${player.name}.`,
+            })
+        } else {
+            interaction.reply(`You already have a profile. Set up on ${player.dateJoined}`);
+        }
     },
 };
