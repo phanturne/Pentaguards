@@ -16,6 +16,7 @@ const cardSchema = new Schema({
     dropCount: Number,
     claimCount: Number,
     wishlistCount: Number,
+    scrapCount: Number,
 })
 
 module.exports = model("Card", cardSchema);

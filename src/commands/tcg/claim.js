@@ -1,10 +1,12 @@
 const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
 const Profile = require(`../../schemas/profileSchema.js`);
+const UniqueID = require(`../../schemas/uniqueIDSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const { createCard, combineCards } = require(`../../tcgHelper/createCard.js`);
 const { request } = require('undici');
 const { createCanvas, Image, loadImage } = require('@napi-rs/canvas');
+const mongoose = require("mongoose");
 
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
@@ -96,30 +98,41 @@ module.exports = {
         };
 
         // Update the card's drop count
-        for (let card of cards) {
-            card.dropCount += 1;
-            card.save().catch(console.error);
+        for (const card of cards) {
+            Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
         }
 
-        const collector = message.createReactionCollector({ filter, max: 1, time: 15000 });
+        const collector = message.createReactionCollector({ filter, max: 1, time: 1000 * 60 * 5});
 
         collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
             // Add the card to the user's profile
-            const card = cards[validEmojis[playerChoice]]
-            player.cardsList.push(card.id + card.printNumber);
+            const card = cards[validEmojis[playerChoice]];
+            const newID = `${card.id}${card.printNumber + 1}`;
+            const border = borders[validEmojis[playerChoice]];
+            player.cardsList.push(newID);
             player.save().catch(console.error);
+
+            // Add the card to the unique IDs database
+            const uniqueCard = new UniqueID({
+                _id: mongoose.Types.ObjectId(),
+                id: newID,
+                cardID: card.id,
+                printNumber: card.printNumber + 1,
+                condition: "N/A",
+                frame: border.name,
+            })
 
             // Update card's print total
             card.claimCount += 1;
             card.save().catch(console.error);
 
-            interaction.followUp("You have successfully claimed a card.")
+            interaction.followUp(`You have successfully claimed \`Card #${newID}\``);
+            //@TODO: include card info
         });
 
-        // collector.on('end', collected => {
-        //     // console.log(`Collected ${collected.size} items`);
-        //     interaction.followUp("You have successfully claimed a card.") //@TODO: include card info
-        // });
+        collector.on('end', collected => {
+            if (collected.size == 0) interaction.followUp("No cards have been claimed")
+        });
     }
 }

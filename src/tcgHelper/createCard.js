@@ -52,6 +52,10 @@ module.exports = {
         // Extend the size of the first card to fit other cards
         // Resize card image based on the frame's new width and height
         let extendedImg = await sharp(cardList[0].attachment)
+            .resize({
+                top: 540 * 1.5,
+                left: 360 * 1.5,
+            })
             .extend({
                 // Pad the image w/ invisible pixels on all sides until its the same size as before
                 top: 0,
