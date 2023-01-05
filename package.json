@@ -22,7 +22,6 @@
     "mz": "^2.7.0",
     "node.js": "^0.0.1-security",
     "sharp": "^0.31.3",
-    "stream-to-iterator": "^3.0.3",
     "undici": "^5.14.0"
   },
   "devDependencies": {
