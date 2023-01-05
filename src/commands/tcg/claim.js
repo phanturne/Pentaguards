@@ -10,13 +10,23 @@ const { request } = require('undici');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("claim")
-        .setDescription("Claim a card from 3 random options."),
+        .setDescription("Claim a card from 3 random options (COSTS 100 SILVER)."),
     async execute(interaction) {
         await interaction.deferReply();
 
         // Get the player profile. Return if the player doesn't exist.
         let player = await Profile.findOne( { id: interaction.user.id })
         if (!player) return interaction.editReply("Please set up an account by typing `/tcg`.");
+
+        // Subtract currency from the player or return an error message if it's insufficient.
+        if (player.silver < 100) {
+            const haveMsg = player.silver === 0 ? "have" : "only have";
+            let embed = new EmbedBuilder()
+                .setColor(0xFF0000)
+                .setDescription(`Insufficient silver. You ${haveMsg} \`${player.silver}\` silver. `)
+            return interaction.editReply({ ephemeral: true, embeds: [embed] });
+        }
+        await player.updateOne( { id: player.id }, { silver: player.silver - 100 });
 
         // Set the number of cards to be generated and claimed, based on the user's status
         const numCards = 3;

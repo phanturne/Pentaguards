@@ -54,7 +54,9 @@ module.exports = {
                         { name: `Full Art`              , value: fullArt        , inline: true, },
                     ]);
 
-                await interaction.reply({ ephemeral: true, embeds: [embed] });
+                await interaction.reply({
+                    // ephemeral: true,
+                    embeds: [embed] });
             }
         } else {
             await interaction.reply({
@@ -109,9 +111,14 @@ module.exports = {
             }
 
             if (row.components.length > 0) {
-                await interaction.reply({ ephemeral: true, embeds: [embed], components: [row]});
+                await interaction.reply({
+                    // ephemeral: true,
+                    embeds: [embed],
+                    components: [row]});
             } else {
-                await interaction.reply({ ephemeral:true, embeds: [embed] });
+                await interaction.reply({
+                    // ephemeral:true,
+                    embeds: [embed] });
             }
         } else {
             await interaction.reply({
