@@ -23,7 +23,11 @@ module.exports = {
                     ephemeral: true });
             }
         } else if (interaction.isButton()) {
-            const button = client.buttons.get(interaction.customId);
+            // Hacky way to use pass the card/artist ID to the "showCardButton"
+            let customId = interaction.customId.startsWith("showCardButton") ? "showCardButton" : interaction.customId;
+            customId = interaction.customId.startsWith("showArtistButton") ? "showArtistButton" : customId;
+
+            const button = client.buttons.get(customId);
             if (!button) return new Error('Button has not been set up.');
 
             try {
@@ -43,7 +47,7 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: 'There is an error with this select menu',
+                    content: 'There is an error with this select menu!',
                     ephemeral: true });
             }
         } else if (interaction.type === InteractionType.ModalSubmit) {
@@ -55,7 +59,7 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: 'There is an error with this modal.!',
+                    content: 'There is an error with this modal!',
                     ephemeral: true });
             }
         } else if (interaction.isContextMenuCommand()) {

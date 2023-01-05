@@ -20,7 +20,7 @@ module.exports = {
                 _id: mongoose.Types.ObjectId(),
                 id: interaction.user.id,
                 name: interaction.user.username,
-                dateJoined: `${day}/${month}/${year}`,
+                dateJoined: `${month}/${date}/${year}`,
                 guild: "N/A",
                 silver: 0,
                 gold: 0,
