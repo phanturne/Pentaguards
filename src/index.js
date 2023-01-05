@@ -47,9 +47,9 @@ client.handleComponents();
 client.login(token);
 
 // Connect to the database
-mongoose.set('strictQuery', false);
-(async () => {
-    // await mongoose.connect(databaseToken).catch(console.error);
-    await mongoose.connect(databaseToken, { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(console.log('Connected to Mongodb.'));
-})();
+// mongoose.set('strictQuery', false);
+// (async () => {
+//     // await mongoose.connect(databaseToken).catch(console.error);
+//     await mongoose.connect(databaseToken, { useNewUrlParser: true, useUnifiedTopology: true })
+//         .then(console.log('Connected to Mongodb.'));
+// })();
