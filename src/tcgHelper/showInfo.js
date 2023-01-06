@@ -32,7 +32,10 @@ module.exports = {
                         { name: `Frame`                  , value: frameInfo.name          , inline: true, },
                     ]);
 
-                await interaction.reply({ ephemeral: true, embeds: [embed], files: [attachment] });
+                await interaction.reply({
+                    // ephemeral: true,
+                    embeds: [embed],
+                    files: [attachment] });
             } else {
                 const collection = card.group ? card.group : "N/A";
                 const aiModel = card.aiModel ? card.aiModel : "Unknown";
@@ -61,50 +64,50 @@ module.exports = {
         } else {
             await interaction.reply({
                 ephemeral: true,
-                content: "Invalid artist ID.",
+                content: "Invalid card ID.",
             })
         }
     },
 
     async showArtist(interaction, artistId) {
-        let profile = await Artist.findOne({id: artistId})
+        let artist = await Artist.findOne({id: artistId})
 
-        // If it is a valid id, display the artist profile
-        if (profile) {
+        // If it is a valid id, display the artist artist
+        if (artist) {
             // Create a list of social media buttons
-            const row = new ActionRowBuilder().addComponents(getSocialButtons(profile));
+            const row = new ActionRowBuilder().addComponents(getSocialButtons(artist));
 
             let embed;
-            if (profile.profilePic) {
+            if (artist.profilePic) {
                 embed = new EmbedBuilder()
                     .setColor(0x0099FF)
-                    .setTitle(`${profile.artist}'s Profile`)
-                    .setImage(profile.profilePic ? profile.profilePic : "https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png")
+                    .setTitle(`${artist.artist}'s Profile`)
+                    .setImage(artist.profilePic ? artist.profilePic : "https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png")
                     .addFields([
                         {
                             name: `Artist ID`,
-                            value: `#${profile.id}`,
+                            value: `#${artist.id}`,
                             inline: true,
                         },
                         {
                             name: `AI Models`,
-                            value: profile.aiModels ? profile.aiModels : "Unknown",
+                            value: artist.aiModels ? artist.aiModels : "Unknown",
                             inline: true,
                         }
                     ]);
             } else {
                 embed = new EmbedBuilder()
                     .setColor(0x0099FF)
-                    .setTitle(`${profile.artist}'s Profile`)
+                    .setTitle(`${artist.artist}'s Profile`)
                     .addFields([
                         {
                             name: `Artist ID`,
-                            value: profile.id,
+                            value: artist.id,
                             inline: true,
                         },
                         {
                             name: `AI Models`,
-                            value: profile.aiModels ? profile.aiModels : "Unknown",
+                            value: artist.aiModels ? artist.aiModels : "Unknown",
                             inline: true,
                         }
                     ]);
