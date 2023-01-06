@@ -8,6 +8,9 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const { token, databaseToken  } = process.env
 
+// Require the library for QuickDB
+const { QuickDB } = require("quick.db");
+
 // Create a new client instance
 const client = new Client({
     intents: [
@@ -25,6 +28,7 @@ client.buttons = new Collection();
 client.selectMenus = new Collection();
 client.modals = new Collection();
 client.commandsArray = [];
+client.db = new QuickDB();
 
 // Process functions (events, commands)
 const functionPath = `${__dirname}/functions`

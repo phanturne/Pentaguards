@@ -12,6 +12,7 @@ module.exports = (client) => {
                 .filter((file) => file.endsWith(".js"))
 
             switch (folder) {
+                case "tcg":
                 case "client":
                     for (const file of eventFiles) {
                         const event = require(`${eventPath}/${folder}/${file}`);

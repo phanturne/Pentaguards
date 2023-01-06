@@ -14,9 +14,11 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        // Get the player profile. Return if the player doesn't exist.
         let player = await Profile.findOne( { id: interaction.user.id })
-        if (!player) return interaction.editReply("Please set up an account by typing `/tcg`.");
+        if (!player) return interaction.editReply({
+            ephemeral: true,
+            content: "Please set up an account by typing `/tcg`.",
+        });
 
         // Subtract currency from the player or return an error message if it's insufficient.
         if (player.silver < 100) {
