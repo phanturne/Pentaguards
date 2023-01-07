@@ -82,7 +82,7 @@ module.exports = {
                 embed = new EmbedBuilder()
                     .setColor(0x0099FF)
                     .setTitle(`${artist.artist}'s Profile`)
-                    .setImage(artist.profilePic ? artist.profilePic : "https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png")
+                    .setThumbnail(artist.profilePic)
                     .addFields([
                         {
                             name: `Artist ID`,
@@ -102,7 +102,7 @@ module.exports = {
                     .addFields([
                         {
                             name: `Artist ID`,
-                            value: artist.id,
+                            value: `#${artist.id}`,
                             inline: true,
                         },
                         {
