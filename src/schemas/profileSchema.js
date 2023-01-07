@@ -9,7 +9,7 @@ const profileSchema = new Schema({
     silver: Number,
     gold: Number,
     diamond: Number,
-    dust: Number,
+    shards: Number,
     wishlist: [String],
     cardsList: [String]
 })

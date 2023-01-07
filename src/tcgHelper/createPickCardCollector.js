@@ -27,7 +27,8 @@ module.exports = {
             await Card.updateOne( { id: card.id }, { dropCount: card.dropCount + 1})
         }
 
-        const collector = message.createReactionCollector({ filter, max: numClaim, time: 1000 * 60 * 5});
+        // Create a reaction collector with a 5-minute time limit
+        const collector = message.createReactionCollector({ filter, max: numClaim, time: 300000});
         await collector.on('collect', (reaction, user) => {
             const choice = validEmojis.get(playerChoice);
             const card = cards[choice];
@@ -72,7 +73,7 @@ module.exports = {
         })
 
         collector.on('end', collected => {
-            if (collected.size == 0) interaction.followUp({
+            if (collected.size === 0) interaction.followUp({
                 ephemeral: true,
                 content: "No cards have been claimed!",
             })
