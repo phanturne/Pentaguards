@@ -7,7 +7,7 @@ module.exports = {
         .setName('tcg')
         .setDescription('Display the user\'s profile.')
         .addUserOption(option => option.setName('target').setDescription('The user\'s avatar to show')),
-    async execute(interaction, client) {
+    async execute(interaction) {
         let player = await Profile.findOne( { id: interaction.user.id })
         // @TODO: Respond with a button that sets up the player profile
         if (!player) {
@@ -20,12 +20,12 @@ module.exports = {
                 _id: mongoose.Types.ObjectId(),
                 id: interaction.user.id,
                 name: interaction.user.username,
-                dateJoined: `${month}/${date}/${year}`,
+                dateJoined: `${month}/${day}/${year}`,
                 guild: "N/A",
                 silver: 0,
                 gold: 0,
                 diamond: 0,
-                dust: 0,
+                shards: 0,
                 wishlist: [],
                 cardsList: [],
             })
