@@ -13,6 +13,8 @@ const artistSchema = new Schema({
     discord: String,
     twitter: String,
     instagram: String,
+    patreon: String,
+    xiaohongshu: String,
 })
 
 module.exports = model("Artist", artistSchema);
