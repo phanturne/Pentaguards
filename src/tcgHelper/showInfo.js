@@ -148,7 +148,7 @@ function getSocialButtons(profile) {
     if (profile.instagram) buttons.push(buildButton("Instagram", profile.instagram));
     if (profile.twitter) buttons.push(buildButton("Twitter", profile.twitter));
     if (profile.patreon) buttons.push(buildButton("Twitter", profile.patreon));
-    if (profile.xiaohongshu) buttons.push(buildButton("小红书、", profile.xiaohongshu));
+    if (profile.xiaohongshu) buttons.push(buildButton("小红书", profile.xiaohongshu));
 
     return buttons;
 }

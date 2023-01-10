@@ -1,10 +1,11 @@
-const { Events } = require('discord.js');
+const { setPresence } = require("../../functions/tools/setPresence");
 
 // When the client is ready, run this code (only once)
 module.exports = {
-    name: Events.ClientReady,
+    name: "ready",
     once: true,
-    execute(client) {
-        console.log(`Ready! Logged in as ${client.user.tag}`);
+    async execute(client) {
+        await client.setPresence();
+        console.log(`Ready! ${client.user.tag} has logged in!`)
     },
 };
