@@ -9,7 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName('submit')
         .setDescription('Submit a card, border, or general '),
-    async execute(interaction, client) {
+    async execute(interaction) {
         await interaction.deferReply();
 
         await createSubmissionCollector(interaction);
@@ -77,6 +77,7 @@ async function createSubmissionCollector(interaction) {
     // Send next message if user accepts TOS. Cancel submission process if they reject.
     tosCollector.on("collect", async (i) => {
         await i.deferUpdate();
+        await tosCollector.stop();
         switch (i.customId) {
             case "tosAccept":
                 await createThemeCollector(interaction);
@@ -98,8 +99,8 @@ async function createThemeCollector(interaction) {
     const themeEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle('Please Choose a Theme')
-        .setDescription(`
-            Please choose a Theme (time period) for your AI artwork:
+        .setDescription(
+            `Please choose a Theme (time period) for your AI artwork:
 
             🐲 Fantasai | Fantasy = the faculty or activity of imagining impossible or improbable things
             - Magic, gravity breaking landscapes (floating islands, levitating rock pillars)
@@ -154,6 +155,8 @@ async function createThemeCollector(interaction) {
 
     // Collect user input and proceed to the next page
     themeCollector.on("collect", async (i) => {
+        await i.deferUpdate();
+        await themeCollector.stop();
         let theme;
         switch (i.customId) {
             case "cancelSubmission":
@@ -186,8 +189,8 @@ async function createCategoryCollector(interaction, theme) {
     const categoryEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle('Please Choose a Category')
-        .setDescription(`
-            <@${interaction.user.id}> has selected ${theme}!
+        .setDescription(
+            `<@${interaction.user.id}> has selected ${theme}!
             We now have the Theme selected for your Card!
             
             Next, please choose the Category for your AI artwork:
@@ -211,6 +214,123 @@ async function createCategoryCollector(interaction, theme) {
             - Abstract, religion, currency, technology, misc...`);
 
     // Create Category buttons
+    const character = new ButtonBuilder()
+        .setCustomId('character')
+        .setLabel('Character')
+        .setEmoji('🧍')
+        .setStyle(ButtonStyle.Secondary);
+
+    const creature = new ButtonBuilder()
+        .setCustomId('creature')
+        .setLabel('Creature')
+        .setEmoji('🦙')
+        .setStyle(ButtonStyle.Secondary);
+
+    const scape = new ButtonBuilder()
+        .setCustomId('scape')
+        .setLabel('Scape')
+        .setEmoji('🌄')
+        .setStyle(ButtonStyle.Secondary);
+
+    const equipment = new ButtonBuilder()
+        .setCustomId('equipment')
+        .setLabel('Equipment')
+        .setEmoji('🛠️')
+        .setStyle(ButtonStyle.Secondary);
+
+    const consumable = new ButtonBuilder()
+        .setCustomId('consumable')
+        .setLabel('Consumable')
+        .setEmoji('🍎')
+        .setStyle(ButtonStyle.Secondary);
+
+    const extres = new ButtonBuilder()
+        .setCustomId('extres')
+        .setLabel('Extres')
+        .setEmoji('🔘')
+        .setStyle(ButtonStyle.Secondary);
+
+    const cancelSubmission = new ButtonBuilder()
+        .setCustomId('cancelSubmission')
+        .setLabel('Cancel Submission')
+        .setStyle(ButtonStyle.Danger);
+
+    const categoryButtons1 = new ActionRowBuilder().addComponents(character, creature, scape, cancelSubmission);
+    const categoryButtons2 = new ActionRowBuilder().addComponents(equipment, consumable, extres);
+
+    // Send the Category embed with the buttons
+    const currPage = await interaction.editReply({
+        embeds: [categoryEmbed.setFooter({ text: `Page 3 / 4` })],
+        components: [categoryButtons1, categoryButtons2],
+        fetchReply: true,
+    });
+
+    // Create a message collector
+    const categoryCollector = await currPage.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        limit: 1,
+    });
+
+    // Collect user's choice for category
+    categoryCollector.on("collect", async (i) => {
+        await i.deferUpdate();
+        await categoryCollector.stop();
+        let category = i.customId;
+        switch (i.customId) {
+            case "cancelSubmission":
+                const rejectEmbed = new EmbedBuilder()
+                    .setColor(0xFF0000)
+                    .setDescription("Submission canceled.")
+                return await interaction.editReply({
+                    embeds: [rejectEmbed],
+                    components: [],
+                })
+            case "character":
+                category = '🧍 Character';
+                break;
+            case "creature":
+                category = '🦙 Creatures';
+                break;
+            case "scape":
+                category = '🌄 Scape';
+                break;
+            case "equipment":
+                category = '🛠️ Equipment';
+                break;
+            case "consumable":
+                category = '🍎 Consumable';
+                break;
+            case "extres":
+                category = '🔘 Extres';
+                break;
+            default:
+                throw console.error;
+        }
+
+        categoryCollector.stop();
+        await createStyleCollector(interaction, theme, category);
+    });
+}
+
+async function createStyleCollector(interaction, theme, category) {
+    // Create Style Embed
+    const styleEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle('Please Choose a Style')
+        .setDescription(
+            `<@${interaction.user.id}> has selected ${category}, in ${theme}!
+
+            Next, what's the Style of your AI artwork:
+            
+            🌸 Anime
+            
+            📷 Realistic
+            - Photorealism, hyperrealism, photograph
+            
+            🖌️ Stylized
+            - Digital painting, concept art, oil painting, watercolor`);
+
+    // Create Style buttons
     const anime = new ButtonBuilder()
         .setCustomId('anime')
         .setLabel('Anime')
@@ -231,27 +351,29 @@ async function createCategoryCollector(interaction, theme) {
 
     const cancelSubmission = new ButtonBuilder()
         .setCustomId('cancelSubmission')
-        .setLabel('Cancal Submission')
+        .setLabel('Cancel Submission')
         .setStyle(ButtonStyle.Danger);
 
-    const cateogryButtons = new ActionRowBuilder().addComponents(anime, realistic, stylized, cancelSubmission);
+    const styleButtons = new ActionRowBuilder().addComponents(anime, realistic, stylized, cancelSubmission);
 
-    // Send the Category embed with the buttons
+    // Send the Style embed with the buttons
     const currPage = await interaction.editReply({
-        embeds: [categoryEmbed.setFooter({ text: `Page 3 / 4` })],
-        components: [cateogryButtons],
+        embeds: [styleEmbed.setFooter({ text: `Page 4 / 4` })],
+        components: [styleButtons],
         fetchReply: true,
     });
 
     // Create a message collector
-    const categoryCollector = await currPage.createMessageComponentCollector({
+    const styleCollector = await currPage.createMessageComponentCollector({
         componentType: ComponentType.Button,
         limit: 1,
     });
 
     // Collect user's choice for category
-    categoryCollector.on("collect", async (i) => {
-        const categoryChoice = i.customId;
+    styleCollector.on("collect", async (i) => {
+        await i.deferUpdate();
+        await styleCollector.stop();
+        let style = i.customId;
         switch (i.customId) {
             case "cancelSubmission":
                 const rejectEmbed = new EmbedBuilder()
@@ -262,16 +384,33 @@ async function createCategoryCollector(interaction, theme) {
                     components: [],
                 })
             case "anime":
-                theme = '🌸 Anime';
+                style = '🌸 Anime';
                 break;
-            case "realisitc":
-                theme = '📷 Realistic';
+            case "realistic":
+                style = '📷 Realistic';
                 break;
             case "stylized":
-                theme = '🖌 Stylized';
+                style = '🖌 Stylized';
                 break;
             default:
                 throw console.error;
         }
+
+        await finalPage(interaction, theme, category, style);
+    });
+}
+
+async function finalPage(interaction, theme, category, style) {
+    const submissionEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
+        .addFields(
+            { name: "Theme", value: theme},
+            { name: "Category", value: category},
+            { name: "Style", value: style},
+        )
+    await interaction.editReply({
+        embeds: [submissionEmbed],
+        components: [],
     });
 }
