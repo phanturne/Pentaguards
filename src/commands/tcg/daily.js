@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder} = require("discord.js");
 const Profile = require(`../../schemas/profileSchema.js`);
 const ms = require("ms");
 
@@ -23,14 +23,24 @@ module.exports = {
         if (lastDaily !== null && timeRemaining > 0) {
             // If user still has a cooldown
             let timeObj = ms(timeRemaining); // timeObj.hours = 12
-            interaction.reply({ content: `Please wait \`${timeObj}\` for the cooldown to end`, ephemeral: true });
+            let embed = new EmbedBuilder()
+                .setColor(0xFF0000)
+                .setDescription(`Please wait \`${timeObj}\` for the cooldown to end.`)
+            interaction.reply({
+                ephemeral: true,
+                embeds: [embed],
+            });
         } else {
             // Otherwise give them their daily and update the cooldown
             await Profile.updateOne( { id: player.id }, { silver: player.silver + rewardAmount });
             await client.db.set(`daily_${interaction.user.id}`, Date.now());
+            let embed = new EmbedBuilder()
+                .setColor(0x0099FF)
+                .setDescription(`You have claimed \`${rewardAmount}\` silver! Come back in \`${ms(cooldown)}\` to claim again.`);
+
             await interaction.reply({
                 ephemeral: true,
-                content: `You have claimed \`${rewardAmount}\` silver! Come back in \`${ms(cooldown)}\` to claim again.`,
+                embeds: [embed],
             });
         }
     }
