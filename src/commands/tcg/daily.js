@@ -25,7 +25,7 @@ module.exports = {
             let timeObj = ms(timeRemaining); // timeObj.hours = 12
             let embed = new EmbedBuilder()
                 .setColor(0xFF0000)
-                .setDescription(`Please wait \`${timeObj}\` for the cooldown to end.`)
+                .setDescription(`Please wait **${timeObj}** for the cooldown to end.`)
             interaction.reply({
                 ephemeral: true,
                 embeds: [embed],
@@ -36,7 +36,7 @@ module.exports = {
             await client.db.set(`daily_${interaction.user.id}`, Date.now());
             let embed = new EmbedBuilder()
                 .setColor(0x0099FF)
-                .setDescription(`You have claimed \`${rewardAmount}\` silver! Come back in \`${ms(cooldown)}\` to claim again.`);
+                .setDescription(`You have claimed **${rewardAmount} silver**! Come back in **${ms(cooldown)}** to claim again.`);
 
             await interaction.reply({
                 ephemeral: true,
