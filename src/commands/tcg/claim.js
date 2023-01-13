@@ -2,15 +2,13 @@ const Profile = require(`../../schemas/profileSchema.js`);
 const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder} = require("discord.js");
-const { cardDropImage } = require(`../../tcgHelper/cardDropImage.js`);
 const { createClaimCardCollector } = require(`../../tcgHelper/createPickCardCollector.js`);
-const { request } = require('undici');
 
 // @TODO: Allow users to claim cards and add into their collection
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("claim")
-        .setDescription("Claim a card from 3 random options (COSTS 100 SILVER)."),
+        .setDescription("Claim a card from 3 random options (Costs 100 silver)."),
     async execute(interaction) {
         await interaction.deferReply();
 
@@ -38,24 +36,7 @@ module.exports = {
         const cards = await Card.aggregate([{ $sample: { size: numCards } }]);
         const frames = await Frame.aggregate([{ $sample: { size: numCards } }]);
 
-        // Create the combined image and send it in an embed
-        const attachment = await cardDropImage(numCards, cards, frames);
-        const claimAmountString = numClaim > 1 ? `${numClaim} cards` : `${numClaim} card`;
-        const embed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle(`Claim ${claimAmountString}`)
-            .setDescription(`You may pick **${claimAmountString}**. React with the respective position emoji to claim.`)
-            .setImage(`attachment://cards.png`)
-            .setThumbnail(interaction.user.avatarURL())
-            .setAuthor({ name: interaction.user.username, iconURL: interaction.user.avatarURL()});
-
-        const message = await interaction.editReply({
-            embeds: [embed],
-            files: [attachment]
-        });
-
         // Create a reaction collector that processes the actual claiming of the card
-        await createClaimCardCollector(message, interaction, numCards, numClaim, cards, frames, player);
-
+        await createClaimCardCollector(interaction, numCards, numClaim, cards, frames, player);
     }
 }

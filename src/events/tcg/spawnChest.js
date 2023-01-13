@@ -74,7 +74,7 @@ async function spawnChest(interaction, client) {
     // Create a reaction collector with a 5-minute time limit
     const collector = message.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        limit: chest.maxClaims,
+        max: chest.maxClaims,
         time: 300000});
 
     // Create a list of players that have already claimed the chest
@@ -92,10 +92,6 @@ async function spawnChest(interaction, client) {
         }
         giveReward(chest, interaction);
         alreadyClaimed.add(interaction.user.id);
-    });
-
-    collector.on('end', collected => {
-        console.log(`Collected ${collected.size} interactions.`);
     });
 }
 

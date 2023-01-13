@@ -71,7 +71,7 @@ async function createSubmissionCollector(interaction) {
     // Create a message collector
     const tosCollector = await currPage.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        limit: 1,
+        max: 1,
     });
 
     // Send next message if user accepts TOS. Cancel submission process if they reject.
@@ -150,7 +150,7 @@ async function createThemeCollector(interaction) {
     // Create a message collector
     const themeCollector = await currPage.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        limit: 1,
+        max: 1,
     });
 
     // Collect user input and proceed to the next page
@@ -268,7 +268,7 @@ async function createCategoryCollector(interaction, theme) {
     // Create a message collector
     const categoryCollector = await currPage.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        limit: 1,
+        max: 1,
     });
 
     // Collect user's choice for category
@@ -366,7 +366,7 @@ async function createStyleCollector(interaction, theme, category) {
     // Create a message collector
     const styleCollector = await currPage.createMessageComponentCollector({
         componentType: ComponentType.Button,
-        limit: 1,
+        max: 1,
     });
 
     // Collect user's choice for category
