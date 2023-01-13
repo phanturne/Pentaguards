@@ -37,8 +37,8 @@ module.exports = {
                     embeds: [embed],
                     files: [attachment] });
             } else {
-                const collection = card.group ? card.group : "N/A";
-                const aiModel = card.aiModel ? card.aiModel : "Unknown";
+                const collection = card.group;
+                const aiModel = card.aiModel;
                 const fullArt = card.fullArt ? `[Source](${card.fullArt})` : "N/A";
 
                 embed = new EmbedBuilder()
@@ -78,40 +78,22 @@ module.exports = {
             const row = new ActionRowBuilder().addComponents(getSocialButtons(artist));
 
             let embed;
-            if (artist.profilePic) {
-                embed = new EmbedBuilder()
-                    .setColor(0x0099FF)
-                    .setTitle(`${artist.artist}'s Profile`)
-                    .setThumbnail(artist.profilePic)
-                    .addFields([
-                        {
-                            name: `Artist ID`,
-                            value: `#${artist.id}`,
-                            inline: true,
-                        },
-                        {
-                            name: `AI Models`,
-                            value: artist.aiModels ? artist.aiModels : "Unknown",
-                            inline: true,
-                        }
-                    ]);
-            } else {
-                embed = new EmbedBuilder()
-                    .setColor(0x0099FF)
-                    .setTitle(`${artist.artist}'s Profile`)
-                    .addFields([
-                        {
-                            name: `Artist ID`,
-                            value: `#${artist.id}`,
-                            inline: true,
-                        },
-                        {
-                            name: `AI Models`,
-                            value: artist.aiModels ? artist.aiModels : "Unknown",
-                            inline: true,
-                        }
-                    ]);
-            }
+            embed = new EmbedBuilder()
+                .setColor(0x0099FF)
+                .setTitle(`${artist.artist}'s Profile`)
+                .setThumbnail(artist.profilePic ? artist.profilePic : "https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png")
+                .addFields([
+                    {
+                        name: `Artist ID`,
+                        value: `#${artist.id}`,
+                        inline: true,
+                    },
+                    {
+                        name: `AI Models`,
+                        value: artist.aiModels ? artist.aiModels : "Unknown",
+                        inline: true,
+                    }
+                ]);
 
             if (row.components.length > 0) {
                 await interaction.reply({

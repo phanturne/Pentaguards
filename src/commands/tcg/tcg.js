@@ -22,10 +22,6 @@ module.exports = {
                 name: interaction.user.username,
                 dateJoined: `${month}/${day}/${year}`,
                 guild: "N/A",
-                silver: 0,
-                gold: 0,
-                diamond: 0,
-                shards: 0,
                 wishlist: [],
                 cardsList: [],
             })

@@ -7,17 +7,17 @@ const cardSchema = new Schema({
     rarity: String,
     style: String,
     category: String,
-    group: String,
+    group: { type: String, default: "N/A" },
     artist: String,
     artistID: String,
-    aiModel: String,
+    aiModel: { type: String, default: "Unknown" },
     url: String,
     fullArt: String,
     dateAdded: String,
-    dropCount: Number,
-    claimCount: Number,
-    wishlistCount: Number,
-    scrapCount: Number,
+    dropCount: { type: Number, default: 0 },
+    claimCount: { type: Number, default: 0 },
+    wishlistCount: { type: Number, default: 0 },
+    scrapCount: { type: Number, default: 0 },
 })
 
 module.exports = model("Card", cardSchema);

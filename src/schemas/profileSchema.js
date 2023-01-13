@@ -5,11 +5,11 @@ const profileSchema = new Schema({
     id: String,
     name: String,
     dateJoined: String,
-    guild: String,
-    silver: Number,
-    gold: Number,
-    diamond: Number,
-    shards: Number,
+    guild: { type: String, default: "N/A" },
+    silver: { type: Number, default: 0 },
+    gold: { type: Number, default: 0 },
+    diamond: { type: Number, default: 0 },
+    shards: { type: Number, default: 0 },
     wishlist: [String],
     cardsList: [String]
 })
