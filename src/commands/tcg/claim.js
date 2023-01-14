@@ -1,4 +1,3 @@
-const Profile = require(`../../schemas/profileSchema.js`);
 const Card = require(`../../schemas/cardSchema.js`);
 const Frame = require(`../../schemas/frameSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder} = require("discord.js");
@@ -9,14 +8,11 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("claim")
         .setDescription("Claim a card from 3 random options (Costs 100 silver)."),
-    async execute(interaction) {
+    async execute(interaction, client) {
         await interaction.deferReply();
 
-        let player = await Profile.findOne( { id: interaction.user.id })
-        if (!player) return interaction.editReply({
-            ephemeral: true,
-            content: "Please set up an account by typing `/tcg`.",
-        });
+        const player = await client.getProfile(interaction);
+        if (!player) return;
 
         // Subtract currency from the player or return an error message if it's insufficient.
         if (player.silver < 100) {
