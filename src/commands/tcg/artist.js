@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { showArtist } = require("../../tcgHelper/showInfo");
 
-
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("artist")
