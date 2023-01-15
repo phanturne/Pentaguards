@@ -1,6 +1,5 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs');
-// const { connect } = require('mongoose');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const mongoose = require("mongoose");
 

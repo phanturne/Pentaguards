@@ -1,0 +1,10 @@
+name = "pentaguards"
+main = "src/index.js"
+compatibility_date = "2023-01-15"
+
+account_id = "8db465b40ff4987a41d55430ae6438dc"
+workers_dev = true
+
+[[r2_buckets]]
+binding = 'MY_BUCKET' # <~ valid JavaScript variable name
+bucket_name = 'pentaguards'
