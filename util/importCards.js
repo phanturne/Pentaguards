@@ -1,8 +1,7 @@
 /*
 Prerequisites:
-1. Use mongoimport to import artworks to "art" database collection
-2. Use mongoimport to import "cards" to "newCards" database collection
-3. Artworks are in a local folder
+1. Use mongoimport to import "cards" to "newCards" database collection
+2. Artworks are in a local folder
  */
 
 const NewCard = require("../src/schemas/newCardSchema");

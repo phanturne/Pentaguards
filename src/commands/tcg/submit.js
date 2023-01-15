@@ -8,15 +8,21 @@ const {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('submit')
-        .setDescription('Submit a card, border, or general '),
+        .setDescription('Submit a card, border, or general ')
+        .addAttachmentOption(option =>
+            option
+                .setName('artwork')
+                .setDescription('Artwork to use for the card')
+                .setRequired(true)),
     async execute(interaction) {
-        await interaction.deferReply();
+        await interaction.deferReply({ ephemeral: true });
+        const artwork = interaction.options.getAttachment('artwork');
 
-        await createSubmissionCollector(interaction);
+        await createSubmissionCollector(interaction, artwork);
     }
 };
 
-async function createSubmissionCollector(interaction) {
+async function createSubmissionCollector(interaction, artwork) {
     // Create TOS Embed
     const tosEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -80,7 +86,7 @@ async function createSubmissionCollector(interaction) {
         await tosCollector.stop();
         switch (i.customId) {
             case "tosAccept":
-                await createThemeCollector(interaction);
+                await createThemeCollector(interaction, artwork);
                 break;
             case "tosReject":
                 const rejectEmbed = new EmbedBuilder()
@@ -94,7 +100,7 @@ async function createSubmissionCollector(interaction) {
     });
 }
 
-async function createThemeCollector(interaction) {
+async function createThemeCollector(interaction, artwork) {
     // Create Theme Embed
     const themeEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -180,11 +186,11 @@ async function createThemeCollector(interaction) {
                 throw console.error;
         }
 
-        await createCategoryCollector(interaction, theme);
+        await createCategoryCollector(interaction, artwork, theme);
     });
 }
 
-async function createCategoryCollector(interaction, theme) {
+async function createCategoryCollector(interaction, artwork, theme) {
     // Create Category Embed
     const categoryEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -308,11 +314,11 @@ async function createCategoryCollector(interaction, theme) {
         }
 
         categoryCollector.stop();
-        await createStyleCollector(interaction, theme, category);
+        await createStyleCollector(interaction, artwork, theme, category);
     });
 }
 
-async function createStyleCollector(interaction, theme, category) {
+async function createStyleCollector(interaction, artwork, theme, category) {
     // Create Style Embed
     const styleEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -396,11 +402,11 @@ async function createStyleCollector(interaction, theme, category) {
                 throw console.error;
         }
 
-        await finalPage(interaction, theme, category, style);
+        await finalPage(interaction, artwork, theme, category, style);
     });
 }
 
-async function finalPage(interaction, theme, category, style) {
+async function finalPage(interaction, artwork, theme, category, style) {
     const submissionEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
@@ -413,4 +419,12 @@ async function finalPage(interaction, theme, category, style) {
         embeds: [submissionEmbed],
         components: [],
     });
+
+    // Show user their submitted card
+    const embed = new EmbedBuilder()
+        .setTitle("Your Card Submission")
+        .setColor(0x0099FF)
+        .setImage(artwork.attachment);
+
+    await interaction.followUp({ embeds: [embed], ephemeral: true })
 }

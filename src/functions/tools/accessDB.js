@@ -6,7 +6,7 @@ module.exports = (client) => {
         const player = await Profile.findOne( { id: user.id })
         if (player) return player;
 
-        const msg = (user === interaction.user) ? "Please set up an account by typing `/tcg`." : `**${user.username}** has not set up their account yet.`;
+        const msg = (user === interaction.user) ? "Please set up an account by typing `/start`." : `**${user.username}** has not set up their account yet.`;
         const embed = new EmbedBuilder()
             .setColor(0xFF0000)
             .setDescription(msg)
