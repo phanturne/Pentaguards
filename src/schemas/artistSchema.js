@@ -3,7 +3,7 @@ const { Schema, model } = require("mongoose");
 const artistSchema = new Schema({
     _id: Schema.Types.ObjectId,
     id: String,
-    name: { type: String, default: "Anonymous" },
+    artist: { type: String, default: "Anonymous" },
     profilePic: String,
     aiModels: String,
     pixiv: String,

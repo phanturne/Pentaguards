@@ -19,22 +19,41 @@ module.exports = {
         await player.save().catch(console.error);
     },
 
-    async createArtist (interaction, client, username = "Anonymous", aiModels, socials) {
+    async createArtist (interaction, client, profilePic, username = "Anonymous", aiModels, socials) {
         // If the artist does not have a profile yet, create one for them
-        let artist = await client.getDiscordArtist(interaction);
-        if (!artist) {
-            artist = await new Artist({
+        let artistProfile = await client.getDiscordArtist(interaction);
+        if (!artistProfile) {
+            artistProfile = await new Artist({
                 _id: Types.ObjectId(),
-                id: Artist.count(),
+                id: await Artist.countDocuments(),
             })
         }
 
-        artist.name = username;
-        artist.discord = interaction.user.username;
-        artist.discordID = interaction.user.id;
+        // Add identification info
+        artistProfile.artist = username;
+        artistProfile.discord = interaction.user.username;
+        artistProfile.discordID = interaction.user.id;
 
-        await artist.save().catch(console.error);
+        // Add optional info
+        if (profilePic) artistProfile.profilePic = profilePic;
+        if (aiModels) artistProfile.aiModels = aiModels;
 
-        return artist.id;
+        // Get the social links provided by the user
+        const socialLinks = socials.split(/\s+/);
+
+        // For each social link, check if it's a valid link.
+        for (const link of socialLinks) {
+            if (link.includes("pixiv.net")) artistProfile.pixiv = link;
+            if (link.includes("fanbox.cc")) artistProfile.pixivFanbox = link;
+            if (link.includes("artstation.com")) artistProfile.artStation = link;
+            if (link.includes("deviantart.com")) artistProfile.deviantArt = link;
+            if (link.includes("twitter.com")) artistProfile.twitter = link;
+            if (link.includes("instagram.com")) artistProfile.instagram = link;
+            if (link.includes("patreon.com")) artistProfile.patreon = link;
+        }
+
+        // Save the artist profile to database and return the ID
+        await artistProfile.save().catch(console.error);
+        return artistProfile.id;
     }
 }

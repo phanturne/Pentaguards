@@ -7,10 +7,11 @@ module.exports = {
     },
     async execute(interaction, client) {
         const username = interaction.fields.getTextInputValue('username');
+        const profilePic = interaction.fields.getTextInputValue('profilePic');
         const aiModels = interaction.fields.getTextInputValue('aiModels');
         const socials = interaction.fields.getTextInputValue('socials')
 
-        const artistID = await createArtist(interaction, client, username, aiModels, socials);
+        const artistID = await createArtist(interaction, client, profilePic, username, aiModels, socials);
 
         let embed = new EmbedBuilder()
             .setColor(0x50C878)
