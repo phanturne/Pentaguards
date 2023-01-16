@@ -1,4 +1,5 @@
 const Profile = require("../../schemas/profileSchema");
+const Artist = require("../../schemas/artistSchema");
 const {EmbedBuilder} = require("discord.js");
 
 module.exports = (client) => {
@@ -13,5 +14,10 @@ module.exports = (client) => {
         await interaction.editReply({
             embeds: [embed],
         });
+    }
+
+    client.getDiscordArtist = async (interaction) => {
+        const artist = await Artist.findOne( { discordID: interaction.user.id })
+        if (artist) return artist;
     }
 }

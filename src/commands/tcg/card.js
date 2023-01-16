@@ -8,7 +8,7 @@ module.exports = {
         .setDescription("Display a card and its stats. ")
         .addStringOption(option =>
             option.setName('id')
-                .setDescription('Enter a card ID or a the unique ID of a specific copy of the card.')
+                .setDescription('Enter a 6 character card id')
                 .setRequired(true)),
     async execute(interaction) {
         const cardId = interaction.options.getString("id");

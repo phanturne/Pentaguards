@@ -7,60 +7,45 @@ const {cardDropImage} = require("./cardDropImage");
 
 module.exports = {
     async showCard(interaction, cardId) {
-        // Find either the card or the unique print of a card
-        const idLen = cardId.length;
-        let card = idLen > 6 ? await UniqueID.findOne({ id: cardId }) : await Card.findOne({id: cardId});
+        // Find the card
+        const card = await UniqueID.findOne({ id: cardId });
+        if (!card) return;
+
+        const cardInfo = await Card.findOne( { id: card.cardID });
+        const frameInfo = await Frame.findOne( { id: card.frameID });
+        const attachment = await cardDropImage(1, [cardInfo], [frameInfo])
+        const collection = card.group;
+        const aiModel = card.aiModel;
+        const fullArt = card.fullArt ? `[Source](${card.fullArt})` : "N/A";
+
+        const embed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle(cardInfo.name)
+            .setImage(`attachment://cards.png`)
+            .addFields([
+                { name: `Unique ID        \u200B`, value: `#${card.id}`           , inline: true, },
+                { name: `Card ID          \u200B`, value: `#${card.cardID}`       , inline: true, },
+                { name: `Print Number`           , value: `#${card.printNumber}`  , inline: true, },
+                { name: `Owner`                  , value: card.ownerName          , inline: true, },
+                { name: `Condition   \u200B`     , value: card.condition          , inline: true, },
+                { name: `Frame`                  , value: frameInfo.name          , inline: true, },
+                { name: `Date Added      \u200B`, value: card.dateAdded , inline: true, },
+                { name: `Card ID         \u200B`, value: `#${card.id}`  , inline: true, },
+                { name: `Rarity`                , value: card.rarity    , inline: true, },
+                { name: `Style   \u200B`        , value: card.style     , inline: true, },
+                { name: `Category`              , value: card.category  , inline: true, },
+                { name: `Collection`            , value: collection     , inline: true, },
+                { name: `Artist`                , value: card.artist    , inline: true, },
+                { name: `AI Model        \u200B`, value: aiModel        , inline: true, },
+                { name: `Full Art`              , value: fullArt        , inline: true, },
+            ]);
+
+        await interaction.reply({
+            embeds: [embed],
+            files: [attachment] });
 
         // Reply with the card embed if the ID is valid. Otherwise, reply with an error message
         if (card) {
-            let embed;
-            if (idLen > 6) {
-                const cardInfo = await Card.findOne( { id: card.cardID });
-                const frameInfo = await Frame.findOne( { id: card.frameID });
-                const attachment = await cardDropImage(1, [cardInfo], [frameInfo])
-
-                embed = new EmbedBuilder()
-                    .setColor(0x0099FF)
-                    .setTitle(cardInfo.name)
-                    .setImage(`attachment://cards.png`)
-                    .addFields([
-                        { name: `Unique ID        \u200B`, value: `#${card.id}`           , inline: true, },
-                        { name: `Card ID          \u200B`, value: `#${card.cardID}`       , inline: true, },
-                        { name: `Print Number`           , value: `#${card.printNumber}`  , inline: true, },
-                        { name: `Owner`                  , value: card.ownerName          , inline: true, },
-                        { name: `Condition   \u200B`     , value: card.condition          , inline: true, },
-                        { name: `Frame`                  , value: frameInfo.name          , inline: true, },
-                    ]);
-
-                await interaction.reply({
-                    // ephemeral: true,
-                    embeds: [embed],
-                    files: [attachment] });
-            } else {
-                const collection = card.group;
-                const aiModel = card.aiModel;
-                const fullArt = card.fullArt ? `[Source](${card.fullArt})` : "N/A";
-
-                embed = new EmbedBuilder()
-                    .setColor(0x0099FF)
-                    .setTitle(card.name)
-                    .setImage(card.url)
-                    .addFields([
-                        { name: `Date Added      \u200B`, value: card.dateAdded , inline: true, },
-                        { name: `Card ID         \u200B`, value: `#${card.id}`  , inline: true, },
-                        { name: `Rarity`                , value: card.rarity    , inline: true, },
-                        { name: `Style   \u200B`        , value: card.style     , inline: true, },
-                        { name: `Category`              , value: card.category  , inline: true, },
-                        { name: `Collection`            , value: collection     , inline: true, },
-                        { name: `Artist`                , value: card.artist    , inline: true, },
-                        { name: `AI Model        \u200B`, value: aiModel        , inline: true, },
-                        { name: `Full Art`              , value: fullArt        , inline: true, },
-                    ]);
-
-                await interaction.reply({
-                    // ephemeral: true,
-                    embeds: [embed] });
-            }
         } else {
             await interaction.reply({
                 ephemeral: true,

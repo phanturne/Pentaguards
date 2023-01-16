@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder,
         ButtonStyle, EmbedBuilder, ComponentType } = require('discord.js');
 const Profile = require(`../../schemas/profileSchema.js`);
+const { createProfile } = require('../../tcgHelper/createAccount');
 const { Types } = require("mongoose");
 
 module.exports = {
@@ -47,24 +48,9 @@ module.exports = {
                 max: 1,
             });
 
-            // Send next message if user accepts TOS. Cancel submission process if they reject.
             collector.on("collect", async () => {
-                const date = new Date()
-                const day = date.getDate();
-                const month = date.getMonth() + 1;
-                const year = date.getFullYear();
-
-                player = await new Profile({
-                    _id: Types.ObjectId(),
-                    id: interaction.user.id,
-                    name: interaction.user.username,
-                    dateJoined: `${month}/${day}/${year}`,
-                    guild: "N/A",
-                    wishlist: [],
-                    cardsList: [],
-                })
-
-                await player.save().catch(console.error);
+                // Create a profile for the player
+                await createProfile(interaction)
                 await interaction.followUp({
                     content: `${player.name}, you have successfully set up an account. Enjoy your adventure!`,
                     ephemeral: true,

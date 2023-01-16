@@ -10,8 +10,8 @@ const profileSchema = new Schema({
     gold: { type: Number, default: 0 },
     diamond: { type: Number, default: 0 },
     shards: { type: Number, default: 0 },
-    wishlist: [String],
-    cardsList: [String]
+    wishlist: { type: [String], default: [] },
+    cardsList: { type: [String], default: [] },
 })
 
 module.exports = model("Profile", profileSchema);

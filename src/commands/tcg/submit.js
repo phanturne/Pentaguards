@@ -2,8 +2,10 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     ButtonBuilder,
-    ButtonStyle, ActionRowBuilder, ComponentType,
+    ButtonStyle, ActionRowBuilder, ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle,
 } = require('discord.js');
+const {Types} = require("mongoose");
+const CardSubmission = require("../../schemas/cardSubmissionSchema");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -18,11 +20,17 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
         const artwork = interaction.options.getAttachment('artwork');
 
-        await createSubmissionCollector(interaction, artwork);
+        // Create new card submission object
+        const cardSubmission = await new CardSubmission({
+            _id: Types.ObjectId(),
+        })
+
+        // Start the submission process
+        await createSubmissionCollector(interaction, cardSubmission, artwork);
     }
 };
 
-async function createSubmissionCollector(interaction, artwork) {
+async function createSubmissionCollector(interaction, cardSubmission, artwork) {
     // Create TOS Embed
     const tosEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -86,7 +94,7 @@ async function createSubmissionCollector(interaction, artwork) {
         await tosCollector.stop();
         switch (i.customId) {
             case "tosAccept":
-                await createThemeCollector(interaction, artwork);
+                await createArtistProfile(interaction, cardSubmission, artwork);
                 break;
             case "tosReject":
                 const rejectEmbed = new EmbedBuilder()
@@ -100,7 +108,14 @@ async function createSubmissionCollector(interaction, artwork) {
     });
 }
 
-async function createThemeCollector(interaction, artwork) {
+async function createArtistProfile(interaction, cardSubmission, artwork) {
+    // Call function to set up artist profile if it is not set up yet.
+
+    // Continue to the next page
+    await createThemeCollector(interaction, cardSubmission, artwork);
+}
+
+async function createThemeCollector(interaction, cardSubmission, artwork) {
     // Create Theme Embed
     const themeEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -163,7 +178,6 @@ async function createThemeCollector(interaction, artwork) {
     themeCollector.on("collect", async (i) => {
         await i.deferUpdate();
         await themeCollector.stop();
-        let theme;
         switch (i.customId) {
             case "cancelSubmission":
                 const rejectEmbed = new EmbedBuilder()
@@ -174,23 +188,23 @@ async function createThemeCollector(interaction, artwork) {
                     components: [],
                 })
             case "fantasai":
-                theme = '🐲 Fantasai';
+                cardSubmission.theme = '🐲 Fantasai';
                 break;
             case "modernai":
-                theme = '🌍 Modernai';
+                cardSubmission.theme = '🌍 Modernai';
                 break;
             case "futurai":
-                theme = '🚀 Futurai';
+                cardSubmission.theme = '🚀 Futurai';
                 break;
             default:
                 throw console.error;
         }
 
-        await createCategoryCollector(interaction, artwork, theme);
+        await createCategoryCollector(interaction, cardSubmission, artwork);
     });
 }
 
-async function createCategoryCollector(interaction, artwork, theme) {
+async function createCategoryCollector(interaction, cardSubmission, artwork) {
     // Create Category Embed
     const categoryEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -281,7 +295,6 @@ async function createCategoryCollector(interaction, artwork, theme) {
     categoryCollector.on("collect", async (i) => {
         await i.deferUpdate();
         await categoryCollector.stop();
-        let category = i.customId;
         switch (i.customId) {
             case "cancelSubmission":
                 const rejectEmbed = new EmbedBuilder()
@@ -292,29 +305,29 @@ async function createCategoryCollector(interaction, artwork, theme) {
                     components: [],
                 })
             case "character":
-                category = '🧍 Character';
+                cardSubmission.category = '🧍 Character';
                 break;
             case "creature":
-                category = '🦙 Creatures';
+                cardSubmission.category = '🦙 Creatures';
                 break;
             case "scape":
-                category = '🌄 Scape';
+                cardSubmission.category = '🌄 Scape';
                 break;
             case "equipment":
-                category = '🛠️ Equipment';
+                cardSubmission.category = '🛠️ Equipment';
                 break;
             case "consumable":
-                category = '🍎 Consumable';
+                cardSubmission.category = '🍎 Consumable';
                 break;
             case "extres":
-                category = '🔘 Extres';
+                cardSubmission.category = '🔘 Extres';
                 break;
             default:
                 throw console.error;
         }
 
         categoryCollector.stop();
-        await createStyleCollector(interaction, artwork, theme, category);
+        await createStyleCollector(interaction, cardSubmission, artwork);
     });
 }
 
@@ -402,29 +415,78 @@ async function createStyleCollector(interaction, artwork, theme, category) {
                 throw console.error;
         }
 
-        await finalPage(interaction, artwork, theme, category, style);
+        await additionalInfo(interaction, artwork, theme, category, style);
     });
 }
 
-async function finalPage(interaction, artwork, theme, category, style) {
+async function additionalInfo(interaction, cardSubmission, artwork) {
+    // Create modal to ask for AI Model and art name
+    const modal = new ModalBuilder()
+        .setCustomId(`additional-card-info`)
+        .setTitle(`Additional Card Info`);
+
+    const cardName = new TextInputBuilder()
+        .setCustomId(`cardName`)
+        .setLabel(`Card Name`)
+        .setRequired(true)
+        .setPlaceholder('Choose a name for the card')
+        .setStyle(TextInputStyle.Short);
+
+    const aiModel = new TextInputBuilder()
+        .setCustomId(`aiModel`)
+        .setLabel(`AI Model`)
+        .setRequired(true)
+        .setPlaceholder('ex. Midjourney, Stable Diffusion, NovelAI, DALLE-2')
+        .setStyle(TextInputStyle.Short);
+
+    const row1 = new ActionRowBuilder().addComponents(cardName);
+    const row2 = new ActionRowBuilder().addComponents(aiModel);
+
+    // Add inputs to the modal
+    modal.addComponents(row1, row2);
+
+    // Show the modal to the user
+    await interaction.showModal(modal);
+
+    // Source: https://stackoverflow.com/questions/72792015/modal-collector-discord-js
+    // Get the Modal Submit Interaction that is emitted once the User submits the Modal
+    const submitted = await interaction.awaitModalSubmit({
+        // Make sure we only accept Modals from the User who sent the original Interaction we're responding to
+        filter: i => i.user.id === interaction.user.id,
+    }).catch(error => {
+        // Catch any Errors that are thrown
+        console.error(error);
+        return null;
+    })
+
+    // Process the modal input and proceed to the final page
+    if (submitted) {
+        cardSubmission.name = interaction.fields.getTextInputValue('cardName');
+        cardSubmission.aiModel = interaction.fields.getTextInputValue('aiModel');
+        await finalPage(interaction, cardSubmission, artwork);
+    }
+}
+
+async function finalPage(interaction, cardSubmission, artwork) {
+    // Generate the card image
+
+    // Save the card submission
+    await cardSubmission.save().catch(console.error);
+
+    // Show user their submitted card
     const submissionEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
+        .setTitle('Your Card Submission')
         .setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
+        .setImage(artwork.attachment)
         .addFields(
-            { name: "Theme", value: theme},
-            { name: "Category", value: category},
-            { name: "Style", value: style},
+            { name: "Theme", value: theme, inline: true},
+            { name: "Category", value: category, inline: true},
+            { name: "Style", value: style, inline: true},
         )
+
     await interaction.editReply({
         embeds: [submissionEmbed],
         components: [],
     });
-
-    // Show user their submitted card
-    const embed = new EmbedBuilder()
-        .setTitle("Your Card Submission")
-        .setColor(0x0099FF)
-        .setImage(artwork.attachment);
-
-    await interaction.followUp({ embeds: [embed], ephemeral: true })
 }
