@@ -2,7 +2,7 @@ const {
     SlashCommandBuilder,
     EmbedBuilder,
     ButtonBuilder,
-    ButtonStyle, ActionRowBuilder, ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle,
+    ButtonStyle, ActionRowBuilder, ComponentType,
 } = require('discord.js');
 const {Types} = require("mongoose");
 const CardSubmission = require("../../schemas/cardSubmissionSchema");
@@ -16,7 +16,7 @@ module.exports = {
                 .setName('artwork')
                 .setDescription('Artwork to use for the card')
                 .setRequired(true)),
-    async execute(interaction) {
+    async execute(interaction, client) {
         await interaction.deferReply({ ephemeral: true });
         const artwork = interaction.options.getAttachment('artwork');
 
@@ -26,11 +26,11 @@ module.exports = {
         })
 
         // Start the submission process
-        await createSubmissionCollector(interaction, cardSubmission, artwork);
+        await createSubmissionCollector(interaction, client, cardSubmission, artwork);
     }
 };
 
-async function createSubmissionCollector(interaction, cardSubmission, artwork) {
+async function createSubmissionCollector(interaction, client, cardSubmission, artwork) {
     // Create TOS Embed
     const tosEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
@@ -77,7 +77,7 @@ async function createSubmissionCollector(interaction, cardSubmission, artwork) {
 
     // Send the TOS embed with the buttons
     const currPage = await interaction.editReply({
-        embeds: [tosEmbed.setFooter({ text: `Part 1 / 4` })],
+        embeds: [tosEmbed.setFooter({ text: `Part 1 / 5` })],
         components: [tosButtons],
         fetchReply: true,
     });
@@ -94,7 +94,7 @@ async function createSubmissionCollector(interaction, cardSubmission, artwork) {
         await tosCollector.stop();
         switch (i.customId) {
             case "tosAccept":
-                await createArtistProfile(interaction, cardSubmission, artwork);
+                await createArtistProfile(interaction, client, cardSubmission, artwork);
                 break;
             case "tosReject":
                 const rejectEmbed = new EmbedBuilder()
@@ -108,11 +108,45 @@ async function createSubmissionCollector(interaction, cardSubmission, artwork) {
     });
 }
 
-async function createArtistProfile(interaction, cardSubmission, artwork) {
+async function createArtistProfile(interaction, client, cardSubmission, artwork) {
     // Call function to set up artist profile if it is not set up yet.
+    const artistProfile = await client.getDiscordArtist(interaction);
+    if (!artistProfile) {
+        const artistProfileEmbed = new EmbedBuilder()
+            .setColor(0x0099FF)
+            .setTitle("Please Create Your Artist Profile")
+            .setDescription(`
+            You do not have an artist profile yet. 
+            Please click the button below to fill out your profile.
+            `)
+            .setFooter({ text: `Part 1a / 5` })
 
-    // Continue to the next page
-    await createThemeCollector(interaction, cardSubmission, artwork);
+        const createArtistProfileButton = new ButtonBuilder()
+            .setCustomId('createArtistProfileButton')
+            .setLabel('Create Artist Profile')
+            .setStyle(ButtonStyle.Secondary);
+
+        const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
+
+        const currPage = await interaction.editReply({
+            embeds: [artistProfileEmbed],
+            components: [row],
+        })
+
+        // Create a message collector
+        const artistCollector = await currPage.createMessageComponentCollector({
+            componentType: ComponentType.Button,
+            max: 1,
+        });
+
+        artistCollector.on("end", async () => {
+            // Continue to the next page
+            await createThemeCollector(interaction, cardSubmission, artwork);
+        });
+    } else {
+        // Continue to the next page
+        await createThemeCollector(interaction, cardSubmission, artwork);
+    }
 }
 
 async function createThemeCollector(interaction, cardSubmission, artwork) {
@@ -163,7 +197,7 @@ async function createThemeCollector(interaction, cardSubmission, artwork) {
 
     // Send the Theme embed with the buttons
     const currPage = await interaction.editReply({
-        embeds: [themeEmbed.setFooter({ text: `Part 2 / 4` })],
+        embeds: [themeEmbed.setFooter({ text: `Part 2 / 5` })],
         components: [themeButtons],
         fetchReply: true,
     });
@@ -210,7 +244,7 @@ async function createCategoryCollector(interaction, cardSubmission, artwork) {
         .setColor(0x0099FF)
         .setTitle('Please Choose a Category')
         .setDescription(
-            `<@${interaction.user.id}> has selected ${theme}!
+            `<@${interaction.user.id}> has selected ${cardSubmission.theme}!
             We now have the Theme selected for your Card!
             
             Next, please choose the Category for your AI artwork:
@@ -280,7 +314,7 @@ async function createCategoryCollector(interaction, cardSubmission, artwork) {
 
     // Send the Category embed with the buttons
     const currPage = await interaction.editReply({
-        embeds: [categoryEmbed.setFooter({ text: `Page 3 / 4` })],
+        embeds: [categoryEmbed.setFooter({ text: `Page 3 / 5` })],
         components: [categoryButtons1, categoryButtons2],
         fetchReply: true,
     });
@@ -331,13 +365,13 @@ async function createCategoryCollector(interaction, cardSubmission, artwork) {
     });
 }
 
-async function createStyleCollector(interaction, artwork, theme, category) {
+async function createStyleCollector(interaction, cardSubmission, artwork) {
     // Create Style Embed
     const styleEmbed = new EmbedBuilder()
         .setColor(0x0099FF)
         .setTitle('Please Choose a Style')
         .setDescription(
-            `<@${interaction.user.id}> has selected ${category}, in ${theme}!
+            `<@${interaction.user.id}> has selected ${cardSubmission.category}, in ${cardSubmission.theme}!
 
             Next, what's the Style of your AI artwork:
             
@@ -377,7 +411,7 @@ async function createStyleCollector(interaction, artwork, theme, category) {
 
     // Send the Style embed with the buttons
     const currPage = await interaction.editReply({
-        embeds: [styleEmbed.setFooter({ text: `Page 4 / 4` })],
+        embeds: [styleEmbed.setFooter({ text: `Page 4 / 5` })],
         components: [styleButtons],
         fetchReply: true,
     });
@@ -392,7 +426,6 @@ async function createStyleCollector(interaction, artwork, theme, category) {
     styleCollector.on("collect", async (i) => {
         await i.deferUpdate();
         await styleCollector.stop();
-        let style = i.customId;
         switch (i.customId) {
             case "cancelSubmission":
                 const rejectEmbed = new EmbedBuilder()
@@ -403,54 +436,48 @@ async function createStyleCollector(interaction, artwork, theme, category) {
                     components: [],
                 })
             case "anime":
-                style = '🌸 Anime';
+                cardSubmission.style = '🌸 Anime';
                 break;
             case "realistic":
-                style = '📷 Realistic';
+                cardSubmission.style = '📷 Realistic';
                 break;
             case "stylized":
-                style = '🖌 Stylized';
+                cardSubmission.style = '🖌 Stylized';
                 break;
             default:
                 throw console.error;
         }
 
-        await additionalInfo(interaction, artwork, theme, category, style);
+        await additionalInfo(interaction, cardSubmission, artwork);
     });
 }
 
 async function additionalInfo(interaction, cardSubmission, artwork) {
-    // Create modal to ask for AI Model and art name
-    const modal = new ModalBuilder()
-        .setCustomId(`additional-card-info`)
-        .setTitle(`Additional Card Info`);
+    const additionalInfoEmbed = new EmbedBuilder()
+        .setColor(0x0099FF)
+        .setTitle("Fill out additional card information")
+        .setDescription(`
+            - Card Name
+            - AI Model
+            `)
+        .setFooter({ text: `Part 5 / 5` })
 
-    const cardName = new TextInputBuilder()
-        .setCustomId(`cardName`)
-        .setLabel(`Card Name`)
-        .setRequired(true)
-        .setPlaceholder('Choose a name for the card')
-        .setStyle(TextInputStyle.Short);
+    const additionalCardInfo = new ButtonBuilder()
+        .setCustomId('additionalCardSubmissionInfoButton')
+        .setLabel('Fill Out Additional Card Info')
+        .setStyle(ButtonStyle.Secondary);
 
-    const aiModel = new TextInputBuilder()
-        .setCustomId(`aiModel`)
-        .setLabel(`AI Model`)
-        .setRequired(true)
-        .setPlaceholder('ex. Midjourney, Stable Diffusion, NovelAI, DALLE-2')
-        .setStyle(TextInputStyle.Short);
+    const row = new ActionRowBuilder().addComponents(additionalCardInfo);
 
-    const row1 = new ActionRowBuilder().addComponents(cardName);
-    const row2 = new ActionRowBuilder().addComponents(aiModel);
-
-    // Add inputs to the modal
-    modal.addComponents(row1, row2);
-
-    // Show the modal to the user
-    await interaction.showModal(modal);
+    await interaction.editReply({
+        embeds: [additionalInfoEmbed],
+        components: [row],
+    })
 
     // Source: https://stackoverflow.com/questions/72792015/modal-collector-discord-js
     // Get the Modal Submit Interaction that is emitted once the User submits the Modal
     const submitted = await interaction.awaitModalSubmit({
+        time: 60000,
         // Make sure we only accept Modals from the User who sent the original Interaction we're responding to
         filter: i => i.user.id === interaction.user.id,
     }).catch(error => {
@@ -461,8 +488,8 @@ async function additionalInfo(interaction, cardSubmission, artwork) {
 
     // Process the modal input and proceed to the final page
     if (submitted) {
-        cardSubmission.name = interaction.fields.getTextInputValue('cardName');
-        cardSubmission.aiModel = interaction.fields.getTextInputValue('aiModel');
+        cardSubmission.name = submitted.fields.getTextInputValue('cardName');
+        cardSubmission.aiModel = submitted.fields.getTextInputValue('aiModel');
         await finalPage(interaction, cardSubmission, artwork);
     }
 }
@@ -480,9 +507,10 @@ async function finalPage(interaction, cardSubmission, artwork) {
         .setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
         .setImage(artwork.attachment)
         .addFields(
-            { name: "Theme", value: theme, inline: true},
-            { name: "Category", value: category, inline: true},
-            { name: "Style", value: style, inline: true},
+            { name: "Theme", value: cardSubmission.theme, inline: true},
+            { name: "Category", value: cardSubmission.category, inline: true},
+            { name: "Style", value: cardSubmission.style, inline: true},
+            { name: "AI Model", value: cardSubmission.aiModel },
         )
 
     await interaction.editReply({

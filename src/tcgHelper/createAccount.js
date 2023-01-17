@@ -19,7 +19,7 @@ module.exports = {
         await player.save().catch(console.error);
     },
 
-    async createArtist (interaction, client, profilePic, username = "Anonymous", aiModels, socials) {
+    async createArtist (interaction, client, profilePic, username, aiModels, socials) {
         // If the artist does not have a profile yet, create one for them
         let artistProfile = await client.getDiscordArtist(interaction);
         if (!artistProfile) {
@@ -30,7 +30,7 @@ module.exports = {
         }
 
         // Add identification info
-        artistProfile.artist = username;
+        artistProfile.artist = username ? username : "Anonymous";
         artistProfile.discord = interaction.user.username;
         artistProfile.discordID = interaction.user.id;
 

@@ -20,7 +20,7 @@ module.exports = {
             message: interaction,
             isSlashGame: false,
             embed: {
-                title: 'Flood',
+                title: 'Flood Fill',
                 color: '#5865F2',
             },
             difficulty: parseInt(interaction.options.getString('difficulty')),
