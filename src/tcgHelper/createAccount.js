@@ -38,11 +38,23 @@ module.exports = {
         if (profilePic) artistProfile.profilePic = profilePic;
         if (aiModels) artistProfile.aiModels = aiModels;
 
+        // Reset social links
+        artistProfile.pixiv = "";
+        artistProfile.pixivFanbox = "";
+        artistProfile.artStation = "";
+        artistProfile.deviantArt = "";
+        artistProfile.twitter = "";
+        artistProfile.instagram = "";
+        artistProfile.patreon = "";
+
         // Get the social links provided by the user
         const socialLinks = socials.split(/\s+/);
 
         // For each social link, check if it's a valid link.
-        for (const link of socialLinks) {
+        for (let link of socialLinks) {
+            // Change links to start with "https://"
+            if (!link.startsWith("https://")) link = `https://${link}`
+
             if (link.includes("pixiv.net")) artistProfile.pixiv = link;
             if (link.includes("fanbox.cc")) artistProfile.pixivFanbox = link;
             if (link.includes("artstation.com")) artistProfile.artStation = link;
