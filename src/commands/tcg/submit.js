@@ -490,12 +490,13 @@ async function additionalInfo(interaction, cardSubmission, artwork) {
     if (submitted) {
         cardSubmission.name = submitted.fields.getTextInputValue('cardName');
         cardSubmission.aiModel = submitted.fields.getTextInputValue('aiModel');
+        await submitted.update("");
         await finalPage(interaction, cardSubmission, artwork);
     }
 }
 
 async function finalPage(interaction, cardSubmission, artwork) {
-    // Generate the card image
+    // @TODO: Generate the card image
 
     // Save the card submission
     await cardSubmission.save().catch(console.error);

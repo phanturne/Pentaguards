@@ -7,7 +7,7 @@ const {cardDropImage} = require("./cardDropImage");
 
 module.exports = {
     async showCard(interaction, cardId) {
-        // Find the card
+        // Find the card info from the database.
         const card = await UniqueID.findOne({ id: cardId });
         if (!card) return;
 

@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { showCard } = require("../../tcgHelper/showInfo");
 
-// @TODO: Implement unique card copy support and card statistics
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("card")

@@ -48,11 +48,11 @@ module.exports = {
                 max: 1,
             });
 
-            collector.on("collect", async () => {
+            collector.on("collect", async (interaction) => {
                 // Create a profile for the player
-                await createProfile(interaction)
-                await interaction.followUp({
-                    content: `${player.name}, you have successfully set up an account. Enjoy your adventure!`,
+                await createProfile(interaction);
+                await interaction.reply({
+                    content: `${interaction.user.username}, you have successfully set up an account. Enjoy your adventure!`,
                     ephemeral: true,
                 })
             })
