@@ -94,7 +94,44 @@ async function createSubmissionCollector(interaction, client, cardSubmission, ar
         await tosCollector.stop();
         switch (i.customId) {
             case "tosAccept":
-                await createArtistProfile(interaction, client, cardSubmission, artwork);
+                // await createArtistProfile(interaction, client, cardSubmission, artwork);
+                const artistProfile = await client.getDiscordArtist(interaction);
+                if (!artistProfile) {
+                    const artistProfileEmbed = new EmbedBuilder()
+                        .setColor(0x0099FF)
+                        .setTitle("Please Create Your Artist Profile")
+                        .setDescription(`
+            You do not have an artist profile yet. 
+            Please click the button below to fill out your profile.
+            `)
+                        .setFooter({ text: `Part 1a / 5` })
+
+                    const createArtistProfileButton = new ButtonBuilder()
+                        .setCustomId('createArtistProfileButton')
+                        .setLabel('Create Artist Profile')
+                        .setStyle(ButtonStyle.Secondary);
+
+                    const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
+
+                    const currPage = await interaction.editReply({
+                        embeds: [artistProfileEmbed],
+                        components: [row],
+                    })
+
+                    // Create a message collector
+                    const artistCollector = await currPage.createMessageComponentCollector({
+                        componentType: ComponentType.Button,
+                        max: 1,
+                    });
+
+                    artistCollector.on("end", async () => {
+                        // Continue to the next page
+                        await createThemeCollector(interaction, cardSubmission, artwork);
+                    });
+                } else {
+                    // Continue to the next page
+                    await createThemeCollector(interaction, cardSubmission, artwork);
+                }
                 break;
             case "tosReject":
                 const rejectEmbed = new EmbedBuilder()
@@ -108,46 +145,46 @@ async function createSubmissionCollector(interaction, client, cardSubmission, ar
     });
 }
 
-async function createArtistProfile(interaction, client, cardSubmission, artwork) {
-    // Call function to set up artist profile if it is not set up yet.
-    const artistProfile = await client.getDiscordArtist(interaction);
-    if (!artistProfile) {
-        const artistProfileEmbed = new EmbedBuilder()
-            .setColor(0x0099FF)
-            .setTitle("Please Create Your Artist Profile")
-            .setDescription(`
-            You do not have an artist profile yet. 
-            Please click the button below to fill out your profile.
-            `)
-            .setFooter({ text: `Part 1a / 5` })
-
-        const createArtistProfileButton = new ButtonBuilder()
-            .setCustomId('createArtistProfileButton')
-            .setLabel('Create Artist Profile')
-            .setStyle(ButtonStyle.Secondary);
-
-        const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
-
-        const currPage = await interaction.editReply({
-            embeds: [artistProfileEmbed],
-            components: [row],
-        })
-
-        // Create a message collector
-        const artistCollector = await currPage.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-            max: 1,
-        });
-
-        artistCollector.on("end", async () => {
-            // Continue to the next page
-            await createThemeCollector(interaction, cardSubmission, artwork);
-        });
-    } else {
-        // Continue to the next page
-        await createThemeCollector(interaction, cardSubmission, artwork);
-    }
-}
+// async function createArtistProfile(interaction, client, cardSubmission, artwork) {
+//     // Call function to set up artist profile if it is not set up yet.
+//     const artistProfile = await client.getDiscordArtist(interaction);
+//     if (!artistProfile) {
+//         const artistProfileEmbed = new EmbedBuilder()
+//             .setColor(0x0099FF)
+//             .setTitle("Please Create Your Artist Profile")
+//             .setDescription(`
+//             You do not have an artist profile yet.
+//             Please click the button below to fill out your profile.
+//             `)
+//             .setFooter({ text: `Part 1a / 5` })
+//
+//         const createArtistProfileButton = new ButtonBuilder()
+//             .setCustomId('createArtistProfileButton')
+//             .setLabel('Create Artist Profile')
+//             .setStyle(ButtonStyle.Secondary);
+//
+//         const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
+//
+//         const currPage = await interaction.editReply({
+//             embeds: [artistProfileEmbed],
+//             components: [row],
+//         })
+//
+//         // Create a message collector
+//         const artistCollector = await currPage.createMessageComponentCollector({
+//             componentType: ComponentType.Button,
+//             max: 1,
+//         });
+//
+//         artistCollector.on("end", async () => {
+//             // Continue to the next page
+//             await createThemeCollector(interaction, cardSubmission, artwork);
+//         });
+//     } else {
+//         // Continue to the next page
+//         await createThemeCollector(interaction, cardSubmission, artwork);
+//     }
+// }
 
 async function createThemeCollector(interaction, cardSubmission, artwork) {
     // Create Theme Embed

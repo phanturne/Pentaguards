@@ -9,8 +9,8 @@ module.exports = {
             option.setName('id')
                 .setDescription('Enter a 6 character card id')
                 .setRequired(true)),
-    async execute(interaction) {
+    async execute(interaction, client) {
         const cardId = interaction.options.getString("id");
-        await showCard(interaction, cardId);
+        await showCard(interaction, client, cardId);
     }
 }

@@ -9,8 +9,8 @@ module.exports = {
             option.setName('id')
                 .setDescription('Artist ID to search for')
                 .setRequired(true)),
-    async execute(interaction) {
+    async execute(interaction, client) {
         const artistId = interaction.options.getString("id");
-        await showArtist(interaction, artistId);
+        await showArtist(interaction, client, artistId);
     }
 }

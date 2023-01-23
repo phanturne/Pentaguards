@@ -12,6 +12,7 @@ const profileSchema = new Schema({
     shards: { type: Number, default: 0 },
     wishlist: { type: [String], default: [] },
     cardsList: { type: [String], default: [] },
+    decks: { type: [[String]], default: [] },
 })
 
 module.exports = model("Profile", profileSchema);

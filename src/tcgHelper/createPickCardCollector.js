@@ -1,4 +1,4 @@
-const UniqueID = require(`../schemas/uniqueIDSchema.js`);
+const UniqueID = require(`../schemas/artworkSchema.js`);
 const Card = require(`../schemas/cardSchema.js`);
 const { cardDropImage } = require("./cardDropImage");
 const { Types } = require("mongoose");
