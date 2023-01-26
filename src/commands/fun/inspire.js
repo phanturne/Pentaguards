@@ -11,9 +11,18 @@ module.exports = {
 		const response = await fetch('https://api.quotable.io/random');
 		const data = await response.json();
 
-		const embed = new EmbedBuilder()
-			.setColor(0x0099FF)
-			.setDescription(`${data["content"]} — ${data["author"]}`);
+		// Create the embed
+		let embed;
+		if (response.ok) {
+			embed = new EmbedBuilder()
+				.setColor(0x0099FF)
+				.setDescription(`${data["content"]} — ${data["author"]}`);
+		} else {
+			embed = new EmbedBuilder()
+				.setColor(0xFF0000)
+				.setDescription(`An error has occurred.`);
+		}
+
 		await interaction.editReply({
 			embeds: [embed],
 		});
