@@ -3,19 +3,19 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('node:fs');
 
 // Allow access to the environment variables of the running node process
-require("dotenv").config();
-const { token, clientId, guildId } = process.env
+require('dotenv').config();
+const { token, clientId, guildId } = process.env;
 
 // Process commands
 module.exports = (client) => {
 	client.handleCommands = async () => {
-		const { commands, commandsArray } = client
-		const commandPath = `${__dirname}/../../commands`
-		const commandFolders = fs.readdirSync(commandPath)
+		const { commands, commandsArray } = client;
+		const commandPath = `${__dirname}/../../commands`;
+		const commandFolders = fs.readdirSync(commandPath);
 		for (const folder of commandFolders) {
 			const commandFiles = fs
 				.readdirSync(`${commandPath}/${folder}`)
-				.filter((file) => file.endsWith(".js"))
+				.filter((file) => file.endsWith('.js'));
 
 			for (const file of commandFiles) {
 				const command = require(`${commandPath}/${folder}/${file}`);
@@ -51,5 +51,5 @@ module.exports = (client) => {
 			// Catch and log any errors!
 			console.error(error);
 		}
-	}
-}
+	};
+};

@@ -1,24 +1,24 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // Allow access to the environment variables of the running node process
-require("dotenv").config();
-const { token, databaseToken  } = process.env
+require('dotenv').config();
+const { token, databaseToken } = process.env;
 
 // Require the library for QuickDB
-const { QuickDB } = require("quick.db");
+const { QuickDB } = require('quick.db');
 
 // Create a new client instance
 const client = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers,
-        GatewayIntentBits.GuildMessageReactions,
-    ],
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildMessageReactions,
+	],
 });
 
 // Create collections for client
@@ -30,16 +30,16 @@ client.commandsArray = [];
 client.db = new QuickDB();
 
 // Process functions (events, commands)
-const functionPath = `${__dirname}/functions`
-const functionFolders = fs.readdirSync(functionPath)
+const functionPath = `${__dirname}/functions`;
+const functionFolders = fs.readdirSync(functionPath);
 for (const folder of functionFolders) {
-    const functionFiles = fs
-        .readdirSync(`${functionPath}/${folder}`)
-        .filter((file) => file.endsWith(".js"))
+	const functionFiles = fs
+		.readdirSync(`${functionPath}/${folder}`)
+		.filter((file) => file.endsWith('.js'));
 
-    for (const file of functionFiles) {
-        require(`${functionPath}/${folder}/${file}`)(client);
-    }
+	for (const file of functionFiles) {
+		require(`${functionPath}/${folder}/${file}`)(client);
+	}
 }
 
 client.handleEvents();
@@ -52,7 +52,7 @@ client.login(token);
 // Connect to the database
 mongoose.set('strictQuery', false);
 (async () => {
-    // await mongoose.connect(databaseToken).catch(console.error);
-    await mongoose.connect(databaseToken, { useNewUrlParser: true, useUnifiedTopology: true })
-        .then(console.log('Connected to Mongodb.'));
+	// await mongoose.connect(databaseToken).catch(console.error);
+	await mongoose.connect(databaseToken, { useNewUrlParser: true, useUnifiedTopology: true })
+		.then(console.log('Connected to Mongodb.'));
 })();

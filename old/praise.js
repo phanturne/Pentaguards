@@ -1,15 +1,15 @@
 const { SlashCommandBuilder } = require('discord.js');
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 
 // Fetch a random praise from https://complimentr.com/api
 function getPraise() {
-  return fetch("https://complimentr.com/api")
-    .then(res => {
-        return res.json();
-    })
-    .then(data => {
-        return ">>> " + data["compliment"];
-    })
+	return fetch('https://complimentr.com/api')
+		.then(res => {
+			return res.json();
+		})
+		.then(data => {
+			return '>>> ' + data['compliment'];
+		});
 }
 
 module.exports = {
