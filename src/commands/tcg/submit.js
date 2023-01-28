@@ -2,9 +2,14 @@ const {
 	SlashCommandBuilder,
 	EmbedBuilder,
 	ButtonBuilder,
-	ButtonStyle, ActionRowBuilder, ComponentType,
+	ButtonStyle,
+	ActionRowBuilder,
+	ComponentType,
+	AttachmentBuilder,
 } = require('discord.js');
 const { Types } = require('mongoose');
+const { createCard } = require('../../tcgHelper/createCard');
+const Profile = require('../../schemas/profileSchema');
 const CardSubmission = require('../../schemas/cardSubmissionSchema');
 
 module.exports = {
@@ -20,17 +25,24 @@ module.exports = {
 		await interaction.deferReply({ ephemeral: true });
 		const artwork = interaction.options.getAttachment('artwork');
 
+		// Get the player's profile
+		const player = await client.getProfile(interaction);
+		if (!player) return;
+
 		// Create new card submission object
 		const cardSubmission = await new CardSubmission({
 			_id: Types.ObjectId(),
 		});
 
 		// Start the submission process
-		await createSubmissionCollector(interaction, client, cardSubmission, artwork);
+		await acceptTOSCollector(player, interaction, client, cardSubmission, artwork);
 	},
 };
 
-async function createSubmissionCollector(interaction, client, cardSubmission, artwork) {
+async function acceptTOSCollector(player, interaction, client, cardSubmission, artwork) {
+	// If the player has already accepted the TOS, skip this step
+	if (player.acceptedTOS) return await createArtistProfile(player, interaction, client, cardSubmission, artwork);
+
 	// Create TOS Embed
 	const tosEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -94,45 +106,11 @@ async function createSubmissionCollector(interaction, client, cardSubmission, ar
 		await tosCollector.stop();
 		switch (i.customId) {
 		case 'tosAccept':
-			// await createArtistProfile(interaction, client, cardSubmission, artwork);
-			const artistProfile = await client.getDiscordArtist(interaction);
-			if (!artistProfile) {
-				const artistProfileEmbed = new EmbedBuilder()
-					.setColor(0x0099FF)
-					.setTitle('Please Create Your Artist Profile')
-					.setDescription(`
-            You do not have an artist profile yet. 
-            Please click the button below to fill out your profile.
-            `)
-					.setFooter({ text: `Part 1a / 5` });
+			// Set TOS accepted state to true
+			await Profile.updateOne({ id: interaction.user.id }, { acceptedTOS: true});
 
-				const createArtistProfileButton = new ButtonBuilder()
-					.setCustomId('createArtistProfileButton')
-					.setLabel('Create Artist Profile')
-					.setStyle(ButtonStyle.Secondary);
-
-				const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
-
-				const currPage = await interaction.editReply({
-					embeds: [artistProfileEmbed],
-					components: [row],
-				});
-
-				// Create a message collector
-				const artistCollector = await currPage.createMessageComponentCollector({
-					componentType: ComponentType.Button,
-					max: 1,
-				});
-
-				artistCollector.on('end', async () => {
-					// Continue to the next page
-					await createThemeCollector(interaction, cardSubmission, artwork);
-				});
-			}
-			else {
-				// Continue to the next page
-				await createThemeCollector(interaction, cardSubmission, artwork);
-			}
+			// Continue to the next page
+			await createArtistProfile(player, interaction, client, cardSubmission, artwork);
 			break;
 		case 'tosReject':
 			const rejectEmbed = new EmbedBuilder()
@@ -146,48 +124,49 @@ async function createSubmissionCollector(interaction, client, cardSubmission, ar
 	});
 }
 
-// async function createArtistProfile(interaction, client, cardSubmission, artwork) {
-//     // Call function to set up artist profile if it is not set up yet.
-//     const artistProfile = await client.getDiscordArtist(interaction);
-//     if (!artistProfile) {
-//         const artistProfileEmbed = new EmbedBuilder()
-//             .setColor(0x0099FF)
-//             .setTitle("Please Create Your Artist Profile")
-//             .setDescription(`
-//             You do not have an artist profile yet.
-//             Please click the button below to fill out your profile.
-//             `)
-//             .setFooter({ text: `Part 1a / 5` })
-//
-//         const createArtistProfileButton = new ButtonBuilder()
-//             .setCustomId('createArtistProfileButton')
-//             .setLabel('Create Artist Profile')
-//             .setStyle(ButtonStyle.Secondary);
-//
-//         const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
-//
-//         const currPage = await interaction.editReply({
-//             embeds: [artistProfileEmbed],
-//             components: [row],
-//         })
-//
-//         // Create a message collector
-//         const artistCollector = await currPage.createMessageComponentCollector({
-//             componentType: ComponentType.Button,
-//             max: 1,
-//         });
-//
-//         artistCollector.on("end", async () => {
-//             // Continue to the next page
-//             await createThemeCollector(interaction, cardSubmission, artwork);
-//         });
-//     } else {
-//         // Continue to the next page
-//         await createThemeCollector(interaction, cardSubmission, artwork);
-//     }
-// }
+async function createArtistProfile(player, interaction, client, cardSubmission, artwork) {
+	// Call function to set up artist profile if it is not set up yet.
+	const artistProfile = await client.getDiscordArtist(interaction);
+	if (!artistProfile) {
+		const artistProfileEmbed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setTitle('Please Create Your Artist Profile')
+			.setDescription(`
+            You do not have an artist profile yet.
+            Please click the button below to fill out your profile.
+            `)
+			.setFooter({ text: `Part 1a / 5` });
 
-async function createThemeCollector(interaction, cardSubmission, artwork) {
+		const createArtistProfileButton = new ButtonBuilder()
+			.setCustomId('createArtistProfileButton')
+			.setLabel('Create Artist Profile')
+			.setStyle(ButtonStyle.Secondary);
+
+		const row = new ActionRowBuilder().addComponents(createArtistProfileButton);
+
+		const currPage = await interaction.editReply({
+			embeds: [artistProfileEmbed],
+			components: [row],
+		});
+
+		// Create a message collector
+		const artistCollector = await currPage.createMessageComponentCollector({
+			componentType: ComponentType.Button,
+			max: 1,
+		});
+
+		artistCollector.on('end', async () => {
+			// Continue to the next page
+			await createThemeCollector(player, interaction, cardSubmission, artwork);
+		});
+	}
+	else {
+		// Continue to the next page
+		await createThemeCollector(player, interaction, cardSubmission, artwork);
+	}
+}
+
+async function createThemeCollector(player, interaction, cardSubmission, artwork) {
 	// Create Theme Embed
 	const themeEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -272,11 +251,11 @@ async function createThemeCollector(interaction, cardSubmission, artwork) {
 			throw console.error;
 		}
 
-		await createCategoryCollector(interaction, cardSubmission, artwork);
+		await createCategoryCollector(player, interaction, cardSubmission, artwork);
 	});
 }
 
-async function createCategoryCollector(interaction, cardSubmission, artwork) {
+async function createCategoryCollector(player, interaction, cardSubmission, artwork) {
 	// Create Category Embed
 	const categoryEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -386,7 +365,7 @@ async function createCategoryCollector(interaction, cardSubmission, artwork) {
 			cardSubmission.category = '🌄 Scape';
 			break;
 		case 'equipment':
-			cardSubmission.category = '🛠️ Equipment';
+			cardSubmission.category = '🛠️Equipment';
 			break;
 		case 'consumable':
 			cardSubmission.category = '🍎 Consumable';
@@ -399,11 +378,11 @@ async function createCategoryCollector(interaction, cardSubmission, artwork) {
 		}
 
 		categoryCollector.stop();
-		await createStyleCollector(interaction, cardSubmission, artwork);
+		await createStyleCollector(player, interaction, cardSubmission, artwork);
 	});
 }
 
-async function createStyleCollector(interaction, cardSubmission, artwork) {
+async function createStyleCollector(player, interaction, cardSubmission, artwork) {
 	// Create Style Embed
 	const styleEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -486,11 +465,11 @@ async function createStyleCollector(interaction, cardSubmission, artwork) {
 			throw console.error;
 		}
 
-		await additionalInfo(interaction, cardSubmission, artwork);
+		await additionalInfo(player, interaction, cardSubmission, artwork);
 	});
 }
 
-async function additionalInfo(interaction, cardSubmission, artwork) {
+async function additionalInfo(player, interaction, cardSubmission, artwork) {
 	const additionalInfoEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Fill out additional card information')
@@ -529,31 +508,29 @@ async function additionalInfo(interaction, cardSubmission, artwork) {
 		cardSubmission.name = submitted.fields.getTextInputValue('cardName');
 		cardSubmission.aiModel = submitted.fields.getTextInputValue('aiModel');
 		await submitted.update('');
-		await finalPage(interaction, cardSubmission, artwork);
+		await finalPage(player, interaction, cardSubmission, artwork);
 	}
 }
 
-async function finalPage(interaction, cardSubmission, artwork) {
+async function finalPage(player, interaction, cardSubmission, artwork) {
 	// @TODO: Generate the card image
-
-	// Save the card submission
-	await cardSubmission.save().catch(console.error);
+	await createCard(cardSubmission.theme.substring(3), cardSubmission.category.substring(3), artwork.attachment);
+	const cardImage = new AttachmentBuilder(`${__dirname}/../../tcgHelper/outputImage.png`);
 
 	// Show user their submitted card
 	const submissionEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Your Card Submission')
 		.setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
-		.setImage(artwork.attachment)
-		.addFields(
-			{ name: 'Theme', value: cardSubmission.theme, inline: true },
-			{ name: 'Category', value: cardSubmission.category, inline: true },
-			{ name: 'Style', value: cardSubmission.style, inline: true },
-			{ name: 'AI Model', value: cardSubmission.aiModel },
-		);
+		// .setImage(artwork.attachment)
+		.setImage('attachment://outputImage.png');
 
 	await interaction.editReply({
 		embeds: [submissionEmbed],
 		components: [],
+		files: [cardImage],
 	});
+
+	// @TODO: Save the card submission to the submission database and add it to the artist's submissions
+	await cardSubmission.save().catch(console.error);
 }

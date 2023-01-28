@@ -1,10 +1,10 @@
-const { generateRandomID } = require('./generateRandomID');
+const { randomCardID } = require('./generateRandomID');
 const sharp = require('sharp');
 
 module.exports = {
 	async createCard(card, artFile, outputFolder) {
 		// Generate a unique card ID
-		const randomID = await generateRandomID(6);
+		const randomID = await randomCardID(6);
 
 		// Use SharpJS to create bigJPG, bigPNG, smallWebp of the card
 		const highResArt = createHighResArt(card.highResArtURL);
@@ -19,8 +19,7 @@ module.exports = {
 	},
 };
 
-async;
-createCard(highRes, comboID, cardId, frameId, newWidth, newLength);
+async createCard(highRes, comboID, cardId, frameId, newWidth, newLength);
 {
 	// Calculate the file names
 	const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
