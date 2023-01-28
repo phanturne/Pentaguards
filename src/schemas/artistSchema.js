@@ -16,6 +16,7 @@ const artistSchema = new Schema({
 	instagram: String,
 	patreon: String,
 	xiaohongshu: String,
+	submissions: { type: [String], default: [] },
 });
 
 module.exports = model('Artist', artistSchema);

@@ -13,6 +13,7 @@ const profileSchema = new Schema({
 	wishlist: { type: [String], default: [] },
 	cardsList: { type: [String], default: [] },
 	decks: { type: [[String]], default: [] },
+	acceptedTOS: { type: Boolean, default: false },
 });
 
 module.exports = model('Profile', profileSchema);

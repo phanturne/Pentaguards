@@ -4,9 +4,9 @@ module.exports = {
 	data: {
 		name: 'showArtistButton',
 	},
-	async execute(interaction) {
+	async execute(interaction, client) {
 		// Card ID is appended to the end of the button's custom ID
 		const idLen = 'showArtistButton'.length;
-		await showArtist(interaction, interaction.customId.substring(idLen));
+		await showArtist(interaction, client, interaction.customId.substring(idLen));
 	},
 };

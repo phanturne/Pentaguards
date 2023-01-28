@@ -120,8 +120,7 @@ module.exports = {
 		// Create a list of social media buttons
 		const row = new ActionRowBuilder().addComponents(getSocialButtons(artist));
 
-		let embed;
-		embed = new EmbedBuilder()
+		const embed = new EmbedBuilder()
 			.setColor(0x0099FF)
 			.setTitle(`${artist.artist}'s Profile`)
 			.setThumbnail(artist.profilePic ? artist.profilePic : 'https://upload.wikimedia.org/wikipedia/commons/c/ca/1x1.png')

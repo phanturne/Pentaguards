@@ -19,7 +19,7 @@ module.exports = {
 		await player.save().catch(console.error);
 	},
 
-	async createArtist(interaction, client, profilePic, username, aiModels, socials) {
+	async createArtist(interaction, client, username, aiModels, socials) {
 		// If the artist does not have a profile yet, create one for them
 		let artistProfile = await client.getDiscordArtist(interaction);
 		if (!artistProfile) {
@@ -35,7 +35,7 @@ module.exports = {
 		artistProfile.discordID = interaction.user.id;
 
 		// Add optional info
-		if (profilePic) artistProfile.profilePic = profilePic;
+		// if (profilePic) artistProfile.profilePic = profilePic;
 		if (aiModels) artistProfile.aiModels = aiModels;
 
 		// Reset social links
@@ -48,20 +48,22 @@ module.exports = {
 		artistProfile.patreon = '';
 
 		// Get the social links provided by the user
-		const socialLinks = socials.split(/\s+/);
+		if (socials) {
+			const socialLinks = socials.split(/\s+/);
 
-		// For each social link, check if it's a valid link.
-		for (let link of socialLinks) {
-			// Change links to start with "https://"
-			if (!link.startsWith('https://')) link = `https://${link}`;
+			// For each social link, check if it's a valid link.
+			for (let link of socialLinks) {
+				// Change links to start with "https://"
+				if (!link.startsWith('https://')) link = `https://${link}`;
 
-			if (link.includes('pixiv.net')) artistProfile.pixiv = link;
-			if (link.includes('fanbox.cc')) artistProfile.pixivFanbox = link;
-			if (link.includes('artstation.com')) artistProfile.artStation = link;
-			if (link.includes('deviantart.com')) artistProfile.deviantArt = link;
-			if (link.includes('twitter.com')) artistProfile.twitter = link;
-			if (link.includes('instagram.com')) artistProfile.instagram = link;
-			if (link.includes('patreon.com')) artistProfile.patreon = link;
+				if (link.includes('pixiv.net')) artistProfile.pixiv = link;
+				if (link.includes('fanbox.cc')) artistProfile.pixivFanbox = link;
+				if (link.includes('artstation.com')) artistProfile.artStation = link;
+				if (link.includes('deviantart.com')) artistProfile.deviantArt = link;
+				if (link.includes('twitter.com')) artistProfile.twitter = link;
+				if (link.includes('instagram.com')) artistProfile.instagram = link;
+				if (link.includes('patreon.com')) artistProfile.patreon = link;
+			}
 		}
 
 		// Save the artist profile to database and return the ID
