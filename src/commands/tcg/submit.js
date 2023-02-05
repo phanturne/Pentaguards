@@ -8,7 +8,7 @@ const {
 	AttachmentBuilder,
 } = require('discord.js');
 const { Types } = require('mongoose');
-const { createCard } = require('../../tcgHelper/createCard');
+const { createSubmission } = require('../../tcgHelper/manageSubmissions');
 const Profile = require('../../schemas/profileSchema');
 const CardSubmission = require('../../schemas/cardSubmissionSchema');
 
@@ -24,6 +24,8 @@ module.exports = {
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
 		const artwork = interaction.options.getAttachment('artwork');
+
+		// Send error message if the file is not a png or jpg
 
 		// Get the player's profile
 		const player = await client.getProfile(interaction);
@@ -514,7 +516,7 @@ async function additionalInfo(player, interaction, cardSubmission, artwork) {
 
 async function finalPage(player, interaction, cardSubmission, artwork) {
 	// @TODO: Generate the card image
-	await createCard(cardSubmission.theme.substring(3), cardSubmission.category.substring(3), artwork.attachment);
+	await createSubmission(cardSubmission.theme.substring(3), cardSubmission.category.substring(3), artwork.attachment);
 	const cardImage = new AttachmentBuilder(`${__dirname}/../../tcgHelper/outputImage.png`);
 
 	// Show user their submitted card

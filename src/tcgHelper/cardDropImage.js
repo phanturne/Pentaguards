@@ -1,6 +1,6 @@
 const { createCanvas, loadImage } = require('@napi-rs/canvas');
 const { AttachmentBuilder } = require('discord.js');
-const { createCard } = require('./createCard');
+const { createSubmission } = require('./manageSubmissions');
 
 module.exports = {
 	async cardDropImage(numCards, cards, frames) {
@@ -19,7 +19,7 @@ module.exports = {
 			//     ),
 			//     {name: `card${i}.png`}
 			// ));
-			newCards.push(await createCard(
+			newCards.push(await createSubmission(
 				cards[i].id + frames[i].id,
 				cards[i].id,
 				frames[i].id,
