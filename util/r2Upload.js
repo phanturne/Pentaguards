@@ -1,7 +1,7 @@
 const http = require('http');
 
 // Allow access to the environment variables of the running node process
-require('dotenv').config({ path: `${__dirname}/../.env`});
+require('dotenv').config({ path: `${__dirname}/../.env` });
 const { R2WorkerSecret } = process.env;
 
 module.exports = {
@@ -12,8 +12,8 @@ module.exports = {
 			path: cloudFilePath,
 			method: 'PUT',
 			headers: {
-				'Content-Type': 'image/png',
-				'Content-Length': imageBuffer.length,
+				// 'Content-Type': 'image/png',
+				// 'Content-Length': imageBuffer.length,
 				'X-Custom-Auth-Key': R2WorkerSecret,
 			},
 		};
@@ -27,9 +27,9 @@ module.exports = {
 			});
 		});
 
-		req.on('error', (error) => {
-			console.error(error);
-		});
+		// req.on('error', (error) => {
+		// 	console.error(error);
+		// });
 
 		// Write the image buffer to the request
 		req.write(imageBuffer);

@@ -1,5 +1,4 @@
 const Card = require(`../../schemas/cardSchema.js`);
-const Frame = require(`../../schemas/frameSchema.js`);
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { createClaimCardCollector } = require(`../../tcgHelper/createPickCardCollector.js`);
 
@@ -17,7 +16,7 @@ module.exports = {
 		// Subtract currency from the player or return an error message if it's insufficient.
 		if (player.silver < 100) {
 			const haveMsg = player.silver === 0 ? 'have' : 'only have';
-			let embed = new EmbedBuilder()
+			const embed = new EmbedBuilder()
 				.setColor(0xFF0000)
 				.setDescription(`Insufficient silver. You ${haveMsg} \`${player.silver}\` silver. `);
 			return interaction.editReply({ ephemeral: true, embeds: [embed] });
@@ -30,7 +29,7 @@ module.exports = {
 
 		// Randomly pick cards and frames
 		const cards = await Card.aggregate([{ $sample: { size: numCards } }]);
-		const frames = await Frame.aggregate([{ $sample: { size: numCards } }]);
+		// const frames = await Frame.aggregate([{ $sample: { size: numCards } }]);
 
 		// Create a reaction collector that processes the actual claiming of the card
 		await createClaimCardCollector(interaction, numCards, numClaim, cards, frames, player);

@@ -3,60 +3,29 @@ const fs = require('fs');
 const axios = require('axios');
 const path = require('path');
 const Jimp = require('jimp');
+const { R2Upload } = require('../../util/r2Upload');
+const CardSubmission = require('../schemas/cardSubmissionSchema');
+const crypto = require('crypto');
 
-// module.exports = {
-// 	async createCard(comboID, cardId, frameId, newWidth, newLength, lengthShift, widthShift) {
-// 		const padTop = Math.ceil((540 - newLength) / 2 - lengthShift);
-// 		const padBottom = Math.floor((540 - newLength) / 2 + lengthShift);
-// 		const padLeft = Math.ceil((360 - newWidth) / 2 - widthShift);
-// 		const padRight = Math.floor((360 - newWidth) / 2 + widthShift);
-//
-// 		// Calculate the file names
-// 		const cardPath = `${__dirname}/../../assets/cards/${cardId}.png`;
-// 		const framePath = `${__dirname}/../../assets/frames/${frameId}.png`;
-// 		const filledFramePath = `${__dirname}/../../assets/filledFrames/${frameId}.png`;
-//
-// 		// Resize card image based on the frame's new width and height
-// 		const resizedImg = await sharp(cardPath)
-// 			.resize({
-// 				width: newWidth,
-// 				height: newLength,
-// 			})
-// 			.extend({
-// 				// Pad the image w/ invisible pixels on all sides until its the same size as before
-// 				top: padTop,
-// 				bottom: padBottom,
-// 				left: padLeft,
-// 				right: padRight,
-// 			})
-// 			.toBuffer()
-// 			.catch(err => {
-// 				console.log('Error: ', err);
-// 			});
-//
-// 		// Apply an overlay to get the card in the shape of the filled frame
-// 		let composite = await sharp(resizedImg)
-// 			.composite([{
-// 				input: filledFramePath,
-// 				blend: 'dest-atop',
-// 			}])
-// 			.toBuffer();
-//
-// 		// Apply an overlay to frame-shaped card to add the actual frame on top
-// 		return await sharp(composite)
-// 			.composite([
-// 				{
-// 					input: framePath,
-// 				},
-// 			])
-// 			.toBuffer();
-// 	},
-// };
+// Helper function that generates a random ID
+function generateRandomID(length) {
+	const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	let randomString = '';
+	for (let i = 0; i < length; i++) {
+		const randomByte = crypto.randomBytes(1);
+		const randomIndex = randomByte[0] % characterSet.length;
+		randomString += characterSet[randomIndex];
+	}
+	return randomString;
+}
 
 module.exports = {
 	async createSubmission(theme, category, url) {
-		// Generate an ID for the submission (increments by 1 each time)
-
+		// Generate a random ID for the submission
+		let submissionID = generateRandomID(8);
+		while (await CardSubmission.findOne({ id: submissionID })) {
+			submissionID = generateRandomID(8);
+		}
 
 		// Get the image artwork from the url and save it to a buffer
 		const imgPath = `${__dirname}/artworkImage.png`;
@@ -74,9 +43,11 @@ module.exports = {
 				let mimeType;
 				if (extension === '.png') {
 					mimeType = Jimp.MIME_PNG;
-				} else if (extension === '.jpeg' || extension === '.jpg') {
+				}
+				else if (extension === '.jpeg' || extension === '.jpg') {
 					mimeType = Jimp.MIME_JPEG;
-				} else {
+				}
+				else {
 					throw new Error('Invalid image type. Only PNG and JPEG are supported.');
 				}
 
@@ -112,30 +83,26 @@ module.exports = {
 			])
 			.toBuffer();
 
-		// Create the webp version of the card and upload it
-		// @TODO: store to buffer and upload buffer directly instead
-		await sharp(cardImage)
+		// Upload webp card
+		const webpBuffer = await sharp(cardImage)
 			.webp({ quality: 50 })
-			.toFile(`${__dirname}/outputImage.webp`);
+			.toBuffer();
+		await R2Upload(webpBuffer, `/submissions/webp/${submissionID}.webp`);
 
-		// Create the large png version of the card nd upload it
+		// Upload the large png version of the card
+		const pngBuffer = await sharp(cardImage)
+			.png({ quality: 100 })
+			.toBuffer();
+		R2Upload(pngBuffer, `/submissions/png/${submissionID}.png`);
 
-		// Store the large jpg version of the artwork
+		// Upload the large png version of the artwork
+		const jpgBuffer = await sharp(imageBuffer)
+			.jpeg({ quality: 100 })
+			.toBuffer();
+		R2Upload(jpgBuffer, `/submissions/jpg/${submissionID}.jpg`);
 
-		// Return the card ID
-	},
-
-	// Finish the create card process AFTER showing the artist their submission, so they don't need to wait as long.
-	async completeSubmission() {
-		// Use SharpJS to create bigJPG, bigPNG, smallWebp of the card
-		const highResArt = createHighResArt(card.highResArtURL);
-		const highResCard = createCard(card, 'highRes');
-		const lowResCard = createCard(card, 'lowRes');
-
-		// Store under submissions/artwork/, submissions/card/, submissions/smallCard/
-
-		// Create a new submission doc
-		// Delete the local files
+		// Return the submission ID
+		return submissionID;
 	},
 
 	// APPROVE SUBMISSIONS

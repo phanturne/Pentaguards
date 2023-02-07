@@ -14,8 +14,9 @@ const cardSubmissionSchema = new Schema({
 	style: String,
 	group: { type: String, default: 'Default' },
 	aiModel: { type: String, default: 'Unknown' },
-	url: String,
-	fullArt: String,
+	webp: String,
+	png: String,
+	jpg: String,
 });
 
 module.exports = model('CardSubmission', cardSubmissionSchema);

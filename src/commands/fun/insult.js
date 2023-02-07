@@ -23,8 +23,9 @@ module.exports = {
 		if (response.ok) {
 			embed = new EmbedBuilder()
 				.setColor(0x0099FF)
-				.setDescription(`${targetVal} ${data["insult"]}`);
-		} else {
+				.setDescription(`${targetVal} ${data['insult']}`);
+		}
+		else {
 			embed = new EmbedBuilder()
 				.setColor(0xFF0000)
 				.setDescription(`An error has occurred.`);

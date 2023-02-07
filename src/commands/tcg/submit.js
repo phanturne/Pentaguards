@@ -109,7 +109,7 @@ async function acceptTOSCollector(player, interaction, client, cardSubmission, a
 		switch (i.customId) {
 		case 'tosAccept':
 			// Set TOS accepted state to true
-			await Profile.updateOne({ id: interaction.user.id }, { acceptedTOS: true});
+			await Profile.updateOne({ id: interaction.user.id }, { acceptedTOS: true });
 
 			// Continue to the next page
 			await createArtistProfile(player, interaction, client, cardSubmission, artwork);
@@ -515,22 +515,23 @@ async function additionalInfo(player, interaction, cardSubmission, artwork) {
 }
 
 async function finalPage(player, interaction, cardSubmission, artwork) {
-	// @TODO: Generate the card image
-	await createSubmission(cardSubmission.theme.substring(3), cardSubmission.category.substring(3), artwork.attachment);
-	const cardImage = new AttachmentBuilder(`${__dirname}/../../tcgHelper/outputImage.png`);
+	// Generate the card image
+	const submissionID = await createSubmission(cardSubmission.theme.substring(3), cardSubmission.category.substring(3), artwork.attachment);
+	cardSubmission.id = submissionID;
+	cardSubmission.webp = `https://pentaguards.phanturne.workers.dev/submissions/webp/${submissionID}.webp`;
+	cardSubmission.png = `https://pentaguards.phanturne.workers.dev/submissions/png/${submissionID}.png`;
+	cardSubmission.jpg = `https://pentaguards.phanturne.workers.dev/submissions/jpg/${submissionID}.jpg`;
+	cardSubmission.status = 'Pending';
 
 	// Show user their submitted card
 	const submissionEmbed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Your Card Submission')
 		.setDescription(`<@${interaction.user.id}>, you have successfully submitted a card! The community will vote on it after it has been approved.`)
-		// .setImage(artwork.attachment)
-		.setImage('attachment://outputImage.png');
-
+		.setImage(cardSubmission.webp)
 	await interaction.editReply({
 		embeds: [submissionEmbed],
 		components: [],
-		files: [cardImage],
 	});
 
 	// @TODO: Save the card submission to the submission database and add it to the artist's submissions
