@@ -1,11 +1,25 @@
+// const crypto = require('crypto');
+
+const CardSubmission = require('../src/schemas/cardSubmissionSchema');
 module.exports = {
-	async randomCardID(length) {
-		let randomID;
+	async generateSubmissionID(length) {
+		let submissionID;
 		while (true) {
-			randomID = Math.random().toString(36).substring(0, length).toUpperCase();
-			const existingCard = Card.findOne({ id: randomID });
+			submissionID = Math.random().toString(36).substring(0, length).toUpperCase();
+			const existingCard = await CardSubmission.findOne({ id: submissionID });
 			if (!existingCard) break;
 		}
-		return randomID;
+		return submissionID;
 	},
+
+	// function generateRandomID(length) {
+	// const characterSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	// let randomString = '';
+	// for (let i = 0; i < length; i++) {
+	// 	const randomByte = crypto.randomBytes(1);
+	// 	const randomIndex = randomByte[0] % characterSet.length;
+	// 	randomString += characterSet[randomIndex];
+	// }
+	// return randomString;
+	// }
 };
