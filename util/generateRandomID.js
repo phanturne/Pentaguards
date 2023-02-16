@@ -1,11 +1,11 @@
 // const crypto = require('crypto');
 
-const CardSubmission = require('../src/schemas/cardSubmissionSchema');
+const CardSubmission = require('../src/schemas/submissionSchema');
 module.exports = {
 	async generateSubmissionID(length) {
 		let submissionID;
 		while (true) {
-			submissionID = Math.random().toString(36).substring(0, length).toUpperCase();
+			submissionID = Math.random().toString(36).substring(2, length + 2).toUpperCase();
 			const existingCard = await CardSubmission.findOne({ id: submissionID });
 			if (!existingCard) break;
 		}
