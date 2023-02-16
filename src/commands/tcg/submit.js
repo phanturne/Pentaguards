@@ -10,7 +10,7 @@ const {
 const { Types } = require('mongoose');
 const { createSubmission } = require('../../tcgHelper/manageSubmissions');
 const Profile = require('../../schemas/profileSchema');
-const CardSubmission = require('../../schemas/cardSubmissionSchema');
+const CardSubmission = require('../../schemas/submissionSchema');
 
 module.exports = {
 	data: new SlashCommandBuilder()

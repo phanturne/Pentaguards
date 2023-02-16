@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 
-const cardSubmissionSchema = new Schema({
+const submissionSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	id: String,
 	serial: String,
@@ -19,4 +19,4 @@ const cardSubmissionSchema = new Schema({
 	jpg: String,
 });
 
-module.exports = model('CardSubmission', cardSubmissionSchema);
+module.exports = model('Submission', submissionSchema);
